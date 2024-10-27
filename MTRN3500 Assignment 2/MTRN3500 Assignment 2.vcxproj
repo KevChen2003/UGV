@@ -134,9 +134,12 @@
     <ClInclude Include="..\include\NetworkedModule.h" />
     <ClInclude Include="..\include\SMObjects.h" />
     <ClInclude Include="..\include\UGVModule.h" />
+    <ClInclude Include="Display.h" />
+    <ClInclude Include="Laser.h" />
     <ClInclude Include="TMM.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Display.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="TMM.cpp" />
   </ItemGroup>
