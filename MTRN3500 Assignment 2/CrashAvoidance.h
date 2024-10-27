@@ -19,9 +19,6 @@ public:
     // Send/Recieve data from shared memory structures
     error_state processSharedMemory() override;
 
-    // Shutdown all modules in the software
-    void shutdownModules();
-
     // Get Shutdown signal for module, from Thread Management SM
     bool getShutdownFlag() override;
 

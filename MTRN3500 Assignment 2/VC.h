@@ -11,8 +11,6 @@ public:
 
 	error_state processSharedMemory() override;
 
-	void shutdownModules();
-
 	bool getShutdownFlag() override;
 
 	void threadFunction() override;

@@ -10,10 +10,6 @@ error_state VC::processSharedMemory() {
 	return error_state::SUCCESS;
 }
 
-void VC::shutdownModules() {
-
-}
-
 bool VC::getShutdownFlag() {
 	return true;
 }

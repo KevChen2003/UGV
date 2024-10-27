@@ -1,6 +1,7 @@
 #pragma once
 
 #include <UGVModule.h>
+#include <SMObjects.h>
 
 using namespace System;
 using namespace System::Threading;
@@ -11,6 +12,13 @@ ref struct ThreadProperties {
     bool Critical;
     String^ ThreadName;
     uint8_t BitID;
+
+    ThreadProperties(ThreadStart^ start, bool crit, uint8_t bitId, String^ threadName) {
+        ThreadStart_ = start;
+        Critical = crit;
+        ThreadName = threadName;
+        BitID = bitId;
+    }
 };
 
 ref class ThreadManagement : public UGVModule {

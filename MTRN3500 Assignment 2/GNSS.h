@@ -21,8 +21,6 @@ public:
 
     error_state processHeartBeats();
 
-    void shutdownThreads();
-
     // Get Shutdown signal for module 
     bool getShutdownFlag() override;
 
@@ -32,6 +30,9 @@ public:
 
     // Send/Recieve data from shared memory structures
     error_state processSharedMemory() override;
+
+    virtual error_state connect(String^ hostName, int portNumber) override;
+    virtual error_state communicate() override;
 
     ~GNSS();
 

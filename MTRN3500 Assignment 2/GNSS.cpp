@@ -8,8 +8,6 @@ error_state GNSS::setupSharedMemory() {
 
 void GNSS::threadFunction() {}
 
-void GNSS::shutdownThreads() {}
-
 bool GNSS::getShutdownFlag() {
 	return true;
 }
@@ -31,3 +29,10 @@ error_state GNSS::processSharedMemory() {
 }
 
 GNSS::~GNSS() {}
+
+error_state GNSS::connect(String^ hostName, int portNumber) {
+	return error_state::SUCCESS;
+}
+error_state GNSS::communicate() {
+	return error_state::SUCCESS;
+}

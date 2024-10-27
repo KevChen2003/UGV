@@ -10,10 +10,6 @@ error_state Display::processSharedMemory() {
 	return error_state::SUCCESS;
 }
 
-void Display::shutdownModules() {
-
-}
-
 bool Display::getShutdownFlag() {
 	return true;
 }

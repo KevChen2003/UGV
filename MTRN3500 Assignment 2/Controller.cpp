@@ -8,8 +8,6 @@ error_state Controller::processSharedMemory() {
 	return error_state::SUCCESS;
 }
 
-void Controller::shutdownModules() {}
-
 bool Controller::getShutdownFlag() {
 	return true;
 }

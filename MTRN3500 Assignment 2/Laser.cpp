@@ -8,8 +8,6 @@ error_state Laser::setupSharedMemory() {
 
 void Laser::threadFunction() {}
 
-void Laser::shutdownThreads() {}
-
 bool Laser::getShutdownFlag() {
 	return true;
 }
@@ -28,6 +26,13 @@ error_state Laser::checkData() {
 
 // Send/Recieve data from shared memory structures
 error_state Laser::processSharedMemory() {
+	return error_state::SUCCESS;
+}
+
+error_state Laser::connect(String^ hostName, int portNumber) {
+	return error_state::SUCCESS;
+}
+error_state Laser::communicate() {
 	return error_state::SUCCESS;
 }
 
