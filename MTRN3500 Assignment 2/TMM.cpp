@@ -15,3 +15,11 @@ bool ThreadManagement::getShutdownFlag() {
 }
 
 void ThreadManagement::threadFunction() {}
+
+error_state ThreadManagement::processHeartBeats() {
+	return error_state::SUCCESS;
+}
+
+ThreadManagement::ThreadManagement() {}
+
+ThreadManagement::~ThreadManagement() {}

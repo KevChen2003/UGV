@@ -6,19 +6,14 @@ using namespace System;
 using namespace System::Threading;
 using namespace System::Diagnostics;
 
-ref struct ThreadProperties {
-    ThreadStart^ ThreadStart_;
-    bool Critical;
-    String^ ThreadName;
-    uint8_t BitID;
-};
-
-ref class ThreadManagement : public UGVModule {
+ref class Controller : public UGVModule {
 public:
 
-    ThreadManagement();
+    Controller();
 
-    ~ThreadManagement();
+    ~Controller();
+
+    error_state processHeartBeats();
 
     // Create shared memory objects
     error_state setupSharedMemory();
@@ -26,11 +21,9 @@ public:
     // Send/Recieve data from shared memory structures
     error_state processSharedMemory() override;
 
-    error_state processHeartBeats();
-
     // Shutdown all modules in the software
     void shutdownModules();
-    
+
     // Get Shutdown signal for module, from Thread Management SM
     bool getShutdownFlag() override;
 
@@ -40,9 +33,6 @@ public:
 private:
     // Add any additional data members or helper functions here
     SM_ThreadManagement^ SM_TM_;
-    SM_Laser^ SM_Laser_; 
+    SM_Laser^ SM_Laser_;
     SM_GPS^ SM_Gps_;
-    array<Stopwatch^>^ StopwatchList;
-    array<Thread^>^ ThreadList;
-    array<ThreadProperties^>^ ThreadPropertiesList;
 };

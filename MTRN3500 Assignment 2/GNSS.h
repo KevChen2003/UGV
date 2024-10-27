@@ -9,10 +9,10 @@ using namespace System;
 using namespace System::Threading;
 using namespace System::Diagnostics;
 
-ref class Laser : public NetworkedModule {
+ref class GNSS : public NetworkedModule {
 public:
 
-    Laser();
+    GNSS();
 
     // Create shared memory objects
     error_state setupSharedMemory();
@@ -27,17 +27,17 @@ public:
     bool getShutdownFlag() override;
 
     error_state communicate() override;
-    
+
     error_state checkData();
 
     // Send/Recieve data from shared memory structures
     error_state processSharedMemory() override;
 
-    ~Laser();
+    ~GNSS();
 
 private:
     // Add any additional data members or helper functions here
     SM_ThreadManagement^ SM_TM_;
-    SM_GPS^ SM_Gps_;
+    SM_Laser^ SM_Laser_;
     Stopwatch^ Watch;
 };

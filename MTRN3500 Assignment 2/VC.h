@@ -2,12 +2,12 @@
 
 #include <NetworkedModule.h>
 
-ref class Display : public NetworkedModule {
+ref class VC : public NetworkedModule {
 public:
 
-	Display();
+	VC();
 
-	Display(SM_ThreadManagement^ SM_TM, SM_Laser^ SM_Laser, SM_GPS^ SM_Gps);
+	VC(SM_ThreadManagement^ SM_TM, SM_Laser^ SM_Laser, SM_GPS^ SM_Gps);
 
 	error_state processSharedMemory() override;
 
@@ -22,9 +22,9 @@ public:
 	virtual error_state connect(String^ hostName, int portNumber) override;
 	virtual error_state communicate() override;
 
-	~Display();
+	~VC();
 
-private: 
+private:
 	// add additional data members or helper functions here
 	SM_ThreadManagement^ SM_TM_;
 	SM_Laser^ SM_Laser_;
