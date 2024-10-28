@@ -5,5 +5,7 @@ int main(void) {
 
 	tmm->setupSharedMemory();
 	tmm->threadFunction();
+
+	Console::ReadKey();
 	return 0;
 }

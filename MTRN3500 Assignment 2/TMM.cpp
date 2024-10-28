@@ -64,7 +64,14 @@ void ThreadManagement::threadFunction() {
 	}
 	// start thread loop
 	// !ConsoleKeyAvailable means that it will stop running once a key has been pressed
-	while (/*!Console::KeyAvailable && */ !getShutdownFlag()) {
+	// maybe insert routine shutdown here
+	while ( /* !Console::KeyAvaialble && */ !getShutdownFlag()) {
+		if (Console::KeyAvailable) {
+			auto key = Console::ReadKey();
+			if (key.KeyChar == 'q') {
+				break;
+			}
+		}
 		Console::WriteLine("TMT Thread is running");
 		processHeartBeats();
 		Thread::Sleep(50);
@@ -101,13 +108,16 @@ error_state ThreadManagement::processHeartBeats() {
 				// stopwatch exceeded time limit
 				if (ThreadPropertiesList[i]->Critical) {
 					// critical thread, shutdown all threads
-					Console::WriteLine(ThreadList[i]->Name + "failure. Shutting down all threads.");
+					Console::WriteLine(ThreadPropertiesList[i]->ThreadName + "failure. Shutting down all threads.");
 					shutdownModules();
 					return error_state::ERR_CRITICAL_PROCESS_FAILURE;
 				}
 				else {
-					Console::WriteLine(ThreadList[i]->Name + "failure. Attempting to restart thread.");
+					Console::WriteLine(ThreadPropertiesList[i]->ThreadName + "failure. Attempting to restart thread.");
 					// not critical thread, try to restart thread
+					// abort first
+					ThreadList[i]->Abort();
+					// new thread object
 					ThreadList[i] = gcnew Thread(ThreadPropertiesList[i]->ThreadStart_);
 
 					// only need to add 1 thread to thread barrier
