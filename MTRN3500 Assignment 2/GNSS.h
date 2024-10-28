@@ -14,6 +14,8 @@ public:
 
     GNSS();
 
+    GNSS(SM_ThreadManagement^ SM_TM, SM_GPS^ SM_Gps);
+
     // Create shared memory objects
     error_state setupSharedMemory();
 
@@ -31,6 +33,8 @@ public:
     // Send/Recieve data from shared memory structures
     error_state processSharedMemory() override;
 
+    void shutdownModules();
+
     virtual error_state connect(String^ hostName, int portNumber) override;
     virtual error_state communicate() override;
 
@@ -40,5 +44,6 @@ private:
     // Add any additional data members or helper functions here
     SM_ThreadManagement^ SM_TM_;
     SM_Laser^ SM_Laser_;
+    SM_GPS^ SM_Gps_;
     Stopwatch^ Watch;
 };

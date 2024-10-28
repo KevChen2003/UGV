@@ -13,6 +13,14 @@ error_state Laser::setupSharedMemory() {
 	return error_state::SUCCESS;
 }
 
+bool Laser::getShutdownFlag() {
+	return true;
+}
+
+error_state Laser::communicate() {
+	return error_state::SUCCESS;
+}
+
 void Laser::threadFunction() {
 	Console::WriteLine("Laser Thread is starting.");
 	// initialise stopwatch
@@ -34,22 +42,7 @@ void Laser::threadFunction() {
 	Console::WriteLine("Laser Thread is terminating.");
 }
 
-bool Laser::getShutdownFlag() {
-	return true;
-}
-
-error_state Laser::communicate() {
-	return error_state::SUCCESS;
-}
-
-error_state Laser::processHeartBeats() {
-	// is the laser bit in the heartbeat byte down
-		// put laser bit up
-		// reset stopwatch
-	// else
-		// has the stopwatch time exceeded crash limit
-			// shutdown all threads
-	
+error_state Laser::processHeartBeats() {	
 	if ((SM_TM_->heartbeat & bit_LASER) == 0) {
 		// if the laser bit in the heartbeat byte is down, put the bit back up
 		SM_TM_->heartbeat |= bit_LASER;
@@ -59,6 +52,7 @@ error_state Laser::processHeartBeats() {
 	else {
 		if (Watch->ElapsedMilliseconds > CRASH_LIMIT) {
 			// if the laser bit is up and the watch has exceeded the limit
+			// shutdown all threads
 			shutdownModules();
 			return error_state::ERR_TMM_FAILURE;
 		}

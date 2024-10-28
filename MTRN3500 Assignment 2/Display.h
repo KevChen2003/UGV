@@ -17,6 +17,8 @@ public:
 
 	error_state processHeartBeats();
 
+	void shutdownModules();
+
 	virtual error_state connect(String^ hostName, int portNumber) override;
 	virtual error_state communicate() override;
 
@@ -27,4 +29,5 @@ private:
 	SM_ThreadManagement^ SM_TM_;
 	SM_Laser^ SM_Laser_;
 	SM_GPS^ SM_Gps_;
+	Stopwatch^ Watch;
 };
