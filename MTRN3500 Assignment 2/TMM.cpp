@@ -66,7 +66,7 @@ void ThreadManagement::threadFunction() {
 	}
 	// start thread loop
 	// !ConsoleKeyAvailable means that it will stop running once a key has been pressed
-	while (!Console::KeyAvailable && getShutdownFlag()) {
+	while (/*!Console::KeyAvailable && */ !getShutdownFlag()) {
 		Console::WriteLine("TMT Thread is running");
 		processHeartBeats();
 		Thread::Sleep(50);
