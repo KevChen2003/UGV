@@ -10,6 +10,8 @@ ref class Controller : public UGVModule {
 public:
 
     Controller();
+    
+    Controller(SM_ThreadManagement^ SM_TM, SM_Laser^ SM_Laser, SM_GPS^ SM_Gps);
 
     ~Controller();
 
@@ -27,9 +29,12 @@ public:
     // Thread function for TMM
     void threadFunction() override;
 
+    void shutdownModules();
+
 private:
     // Add any additional data members or helper functions here
     SM_ThreadManagement^ SM_TM_;
     SM_Laser^ SM_Laser_;
     SM_GPS^ SM_Gps_;
+    Stopwatch^ Watch;
 };
