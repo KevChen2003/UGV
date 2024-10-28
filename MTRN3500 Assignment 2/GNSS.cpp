@@ -2,9 +2,10 @@
 
 GNSS::GNSS() {}
 
-GNSS::GNSS(SM_ThreadManagement^ SM_TM, SM_GPS^ SM_Gps) {
+GNSS::GNSS(SM_ThreadManagement^ SM_TM, SM_Laser^ SM_Laser, SM_GPS^ SM_Gps) {
 	SM_TM_ = SM_TM;
 	SM_Gps_ = SM_Gps;
+	SM_Laser_ = SM_Laser;
 }
 
 error_state GNSS::setupSharedMemory() {
@@ -13,10 +14,6 @@ error_state GNSS::setupSharedMemory() {
 
 bool GNSS::getShutdownFlag() {
 	return true;
-}
-
-error_state GNSS::communicate() {
-	return error_state::SUCCESS;
 }
 
 void GNSS::threadFunction() {

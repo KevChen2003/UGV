@@ -30,12 +30,12 @@ void ThreadManagement::threadFunction() {
 	// make a list of thread properties
 	// assuming that crash avoidance thread is critical
 	ThreadPropertiesList = gcnew array<ThreadProperties^>{
-		gcnew ThreadProperties(gcnew ThreadStart(gcnew Laser(), &Laser::threadFunction), true, bit_LASER, "Laser Thread"),
-			gcnew ThreadProperties(gcnew ThreadStart(gcnew GNSS(), &GNSS::threadFunction), false, bit_GPS, "GNSS Thread"),
-			gcnew ThreadProperties(gcnew ThreadStart(gcnew Controller(), &Controller::threadFunction), true, bit_CONTROLLER, "Controller Thread"),
-			gcnew ThreadProperties(gcnew ThreadStart(gcnew VC(), &VC::threadFunction), true, bit_VC, "VC Thread"),
-			gcnew ThreadProperties(gcnew ThreadStart(gcnew Display(), &Display::threadFunction), true, bit_DISPLAY, "Display Thread"),
-			gcnew ThreadProperties(gcnew ThreadStart(gcnew CrashAvoidance(), &CrashAvoidance::threadFunction), true, bit_CRASHAVOIDANCE, "Crash Avoidance Thread")
+		gcnew ThreadProperties(gcnew ThreadStart(gcnew Laser(SM_TM_, SM_Laser_, SM_Gps_), &Laser::threadFunction), true, bit_LASER, "Laser Thread"),
+			gcnew ThreadProperties(gcnew ThreadStart(gcnew GNSS(SM_TM_, SM_Laser_, SM_Gps_), &GNSS::threadFunction), false, bit_GPS, "GNSS Thread"),
+			gcnew ThreadProperties(gcnew ThreadStart(gcnew Controller(SM_TM_, SM_Laser_, SM_Gps_), &Controller::threadFunction), true, bit_CONTROLLER, "Controller Thread"),
+			gcnew ThreadProperties(gcnew ThreadStart(gcnew VC(SM_TM_, SM_Laser_, SM_Gps_), &VC::threadFunction), true, bit_VC, "VC Thread"),
+			gcnew ThreadProperties(gcnew ThreadStart(gcnew Display(SM_TM_, SM_Laser_, SM_Gps_), &Display::threadFunction), true, bit_DISPLAY, "Display Thread"),
+			gcnew ThreadProperties(gcnew ThreadStart(gcnew CrashAvoidance(SM_TM_, SM_Laser_, SM_Gps_), &CrashAvoidance::threadFunction), true, bit_CRASHAVOIDANCE, "Crash Avoidance Thread")
 	};
 	// list of threads
 	ThreadList = gcnew array<Thread^>(ThreadPropertiesList->Length);

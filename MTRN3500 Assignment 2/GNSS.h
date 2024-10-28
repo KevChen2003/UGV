@@ -14,7 +14,7 @@ public:
 
     GNSS();
 
-    GNSS(SM_ThreadManagement^ SM_TM, SM_GPS^ SM_Gps);
+    GNSS(SM_ThreadManagement^ SM_TM, SM_Laser^ SM_Laser, SM_GPS^ SM_Gps);
 
     // Create shared memory objects
     error_state setupSharedMemory();
@@ -25,8 +25,6 @@ public:
 
     // Get Shutdown signal for module 
     bool getShutdownFlag() override;
-
-    error_state communicate() override;
 
     error_state checkData();
 

@@ -2,9 +2,10 @@
 
 Laser::Laser() {}
 
-Laser::Laser(SM_ThreadManagement^ SM_TM, SM_Laser^ SM_Laser) {
+Laser::Laser(SM_ThreadManagement^ SM_TM, SM_Laser^ SM_Laser, SM_GPS^ SM_Gps) {
 	SM_TM_ = SM_TM;
 	SM_Laser_ = SM_Laser;
+	SM_Gps_ = SM_Gps;
 	// not sure if stopwatch required below as its intiialised in the thread function again later
 	//Watch = gcnew Stopwatch;
 }
@@ -70,9 +71,6 @@ error_state Laser::processSharedMemory() {
 }
 
 error_state Laser::connect(String^ hostName, int portNumber) {
-	return error_state::SUCCESS;
-}
-error_state Laser::communicate() {
 	return error_state::SUCCESS;
 }
 
