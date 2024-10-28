@@ -22,7 +22,8 @@ enum error_state {
 	ERR_INVALID_DATA,
 	ERR_SM,
 	ERR_CONNECTION,
-	ERR_CRITICAL_PROCESS_FAILURE
+	ERR_CRITICAL_PROCESS_FAILURE,
+	ERR_TMM_FAILURE
 	// Define your own additional error types as needed
 };
 

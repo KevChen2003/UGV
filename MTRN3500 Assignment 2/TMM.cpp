@@ -6,8 +6,6 @@
 #include "CrashAvoidance.h"
 #include "VC.h"
 
-#define CRASH_LIMIT 1000 // stopwatch crash limit in milliseconds, assuming for now based off lectures since didn't find in other files
-
 error_state ThreadManagement::setupSharedMemory() {
 	SM_TM_ = gcnew SM_ThreadManagement;
 	SM_Laser_ = gcnew SM_Laser;
