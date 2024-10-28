@@ -19,7 +19,7 @@ error_state Controller::processSharedMemory() {
 }
 
 bool Controller::getShutdownFlag() {
-	return true;
+	return (SM_TM_->shutdown & bit_CONTROLLER);
 }
 
 void Controller::shutdownModules() {

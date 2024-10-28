@@ -13,7 +13,7 @@ error_state GNSS::setupSharedMemory() {
 }
 
 bool GNSS::getShutdownFlag() {
-	return true;
+	return (SM_TM_->shutdown & bit_GPS);
 }
 
 void GNSS::threadFunction() {

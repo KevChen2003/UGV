@@ -15,7 +15,7 @@ error_state Laser::setupSharedMemory() {
 }
 
 bool Laser::getShutdownFlag() {
-	return true;
+	return (SM_TM_->shutdown & bit_LASER);
 }
 
 error_state Laser::communicate() {

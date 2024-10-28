@@ -19,7 +19,7 @@ error_state CrashAvoidance::processSharedMemory() {
 
 
 bool CrashAvoidance::getShutdownFlag() {
-	return true;
+	return (SM_TM_->shutdown & bit_CRASHAVOIDANCE);
 }
 
 void CrashAvoidance::shutdownModules() {

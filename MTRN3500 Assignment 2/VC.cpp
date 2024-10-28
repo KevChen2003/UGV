@@ -14,7 +14,7 @@ error_state VC::processSharedMemory() {
 }
 
 bool VC::getShutdownFlag() {
-	return true;
+	return (SM_TM_->shutdown & bit_VC);
 }
 
 

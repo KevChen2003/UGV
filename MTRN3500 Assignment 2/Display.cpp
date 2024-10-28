@@ -14,7 +14,7 @@ error_state Display::processSharedMemory() {
 }
 
 bool Display::getShutdownFlag() {
-	return true;
+	return (SM_TM_->shutdown & bit_DISPLAY);
 }
 
 error_state Display::connect(String^ hostName, int portNumber) {
