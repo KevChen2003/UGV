@@ -6,6 +6,8 @@
 #include "CrashAvoidance.h"
 #include "VC.h"
 
+#define CRASH_LIMIT 1000 // stopwatch crash limit in milliseconds, assuming for now based off lectures since didn't find in other files
+
 error_state ThreadManagement::setupSharedMemory() {
 	SM_TM_ = gcnew SM_ThreadManagement;
 	SM_Laser_ = gcnew SM_Laser;
@@ -76,9 +78,50 @@ void ThreadManagement::threadFunction() {
 	for (int i = 0; i < ThreadPropertiesList->Length; i++) {
 		ThreadList[i]->Join();
 	}
+	Console::WriteLine("TMT Thread is terminating.");
 }
 
 error_state ThreadManagement::processHeartBeats() {
+	// check heart beat flag of thread
+		// if a response is received -> flag should be high:
+			// put flag down and reset stopwatch	
+	// else
+		// check if stopwatch has exceeded time limit, if it hasn't then do nothing, if it has then:
+			// if the process is critical, shutdown all threads, if not then restart the thread
+
+	for (int i = 0; i < ThreadList->Length; i++) {
+		// check heart beat flag of thread, if a response is received it should be high
+		if (SM_TM_->heartbeat & ThreadPropertiesList[i]->BitID) {
+			// if bit is high, put it down and reset stopwatch
+			SM_TM_->heartbeat ^= ThreadPropertiesList[i]->BitID;
+			StopwatchList[i]->Restart();
+		}
+		else {
+			// if bit is down, check if stopwatch has exceeded time limit
+			// else, don't do anything
+			if (StopwatchList[i]->ElapsedMilliseconds > CRASH_LIMIT) {
+				// stopwatch exceeded time limit
+				if (ThreadPropertiesList[i]->Critical) {
+					// critical thread, shutdown all threads
+					Console::WriteLine(ThreadList[i]->Name + "failure. Shutting down all threads.");
+					shutdownModules();
+					return error_state::ERR_CRITICAL_PROCESS_FAILURE;
+				}
+				else {
+					Console::WriteLine(ThreadList[i]->Name + "failure. Attempting to restart thread.");
+					// not critical thread, try to restart thread
+					ThreadList[i] = gcnew Thread(ThreadPropertiesList[i]->ThreadStart_);
+
+					// only need to add 1 thread to thread barrier
+					SM_TM_->ThreadBarrier = gcnew Barrier(1);
+
+					// start the thread
+					ThreadList[i]->Start();
+				}
+			}
+		}
+	}
+
 	return error_state::SUCCESS;
 }
 
