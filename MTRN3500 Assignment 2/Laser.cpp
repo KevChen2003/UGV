@@ -31,41 +31,45 @@ void Laser::threadFunction() {
 	if (!getShutdownFlag() && connect(WEEDER_ADDRESS, 23000) == error_state::SUCCESS) {
 		Console::WriteLine("Connected to Laser Successfully.");
 		// configure scan and start measurement
-		if (communicate("\x02sMN mLMPsetscancfg 5000 1 5000 0 1800000\x03") == error_state::SUCCESS && communicate("\x02sMN LMCstartmeas\x03") == error_state::SUCCESS) {
-			while (!getShutdownFlag()) {
-				Console::WriteLine("Laser Thread is running.");
-				processHeartBeats();
-				// laser functionality 
-				/*
-				if (communicate() == error_state::SUCCESS && checkData() == error_state::SUCCESS) {
-					// if communication is successful and data is successful, put the data in laser shared memory
-					processSharedMemory();
-				}
-				*/
-				// start scanning, setting parameter to 1 enables the continuous transmission of scan data
-				// communicate("\x02sEN LMDscandata 1\x03");
-				// only scan once to not hold up the thread 
-				error_state response = communicate("\x02sRN LMDscandata\x03");
-				if (response != error_state::SUCCESS) {
-					Console::WriteLine("Error trying to scan data.");
-					break;
-				}
-				// read data
-				String^ scanData = System::Text::Encoding::ASCII->GetString(ReadData);
-				Console::WriteLine(scanData);
-
-				Thread::Sleep(20);
+		// if (communicate("\x02sMN mLMPsetscancfg 5000 1 5000 0 1800000\x03") == error_state::SUCCESS && communicate("\x02sMN LMCstartmeas\x03") == error_state::SUCCESS) {
+		while (!getShutdownFlag()) {
+			Console::WriteLine("Laser Thread is running.");
+			processHeartBeats();
+			// laser functionality 
+			/*
+			if (communicate() == error_state::SUCCESS && checkData() == error_state::SUCCESS) {
+				// if communication is successful and data is successful, put the data in laser shared memory
+				processSharedMemory();
 			}
+			*/
+			// start scanning, setting parameter to 1 enables the continuous transmission of scan data
+			// communicate("\x02sEN LMDscandata 1\x03");
+			// only scan once to not hold up the thread 
+			error_state response = sendCommand("sRN LMDscandata");
+			if (response != error_state::SUCCESS) {
+				Console::WriteLine("Error trying to scan data.");
+				break;
+			}
+			// read data
+			String^ scanData = System::Text::Encoding::ASCII->GetString(ReadData);
+			Console::WriteLine(scanData);
+
+			Thread::Sleep(20);
+		}
+		/*
 		}
 		else {
 			Console::WriteLine("Failed to configure scan, or start measurement.");
 		}
+		*/ 
 	}
 	// stop measurement
+	/*
 	error_state response = communicate("\x02sMN LMCstopmeas\x03");
 	if (response != error_state::SUCCESS) {
 		Console::WriteLine("Error trying to stop measurement.");
 	}
+	*/
 	Console::WriteLine("Laser Thread is terminating.");
 }
 
@@ -100,13 +104,15 @@ error_state Laser::communicate() {
 	return error_state::SUCCESS;
 }
 
-error_state Laser::communicate(String^ command) {
+error_state Laser::sendCommand(String^ command) {
 	if (Client == nullptr || Stream == nullptr) {
 		return error_state::ERR_CONNECTION;
 	}
 	try {
 		SendData = System::Text::Encoding::ASCII->GetBytes(command);
+		Stream->WriteByte(0x02);
 		Stream->Write(SendData, 0, SendData->Length);
+		Stream->WriteByte(0x03);
 		Threading::Thread::Sleep(10);
 		Stream->Read(ReadData, 0, ReadData->Length);
 		// String^ Response = System::Text::Encoding::ASCII->GetString(ReadData);
@@ -128,10 +134,11 @@ error_state Laser::communicate(String^ command) {
 }
 
 error_state Laser::connect(String^ hostName, int portNumber) {
+	// should already connect to it
 	Client = gcnew TcpClient(hostName, portNumber);
 	Stream = Client->GetStream();
 	Client->NoDelay = true;
-	Client->ReceiveTimeout = 500;
+	// Client->ReceiveTimeout = 500;
 	Client->SendTimeout = 500;
 	Client->ReceiveBufferSize = 1024;
 	Client->SendBufferSize = 1024;

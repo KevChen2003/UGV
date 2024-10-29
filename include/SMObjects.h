@@ -52,7 +52,7 @@ public:
 
 // This is the size of the data recieved from the laser
 #define STANDARD_LASER_LENGTH 361
-#define CRASH_LIMIT 1000 // stopwatch crash limit in milliseconds, assuming for now based off lectures since didn't find in other files
+#define CRASH_LIMIT 3000 // stopwatch crash limit in milliseconds, assuming for now based off lectures since didn't find in other files
 
 
 ref class SM_Laser
