@@ -35,6 +35,7 @@ public:
 
     virtual error_state connect(String^ hostName, int portNumber) override;
     virtual error_state communicate() override;
+    error_state communicate(String^ command);
 
     ~Laser();
 
@@ -44,4 +45,5 @@ private:
     SM_GPS^ SM_Gps_;
     SM_Laser^ SM_Laser_;
     Stopwatch^ Watch;
+    array<unsigned char>^ SendData;		// array for sending data
 };
