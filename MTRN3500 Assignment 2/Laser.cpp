@@ -54,8 +54,35 @@ void Laser::threadFunction() {
 				break;
 			}
 			// read data
-			String^ scanData = System::Text::Encoding::ASCII->GetString(ReadData);
-			Console::WriteLine(scanData);
+			String^ ScanData = System::Text::Encoding::ASCII->GetString(ReadData);
+			// Console::WriteLine("SCAN DATA BELOWWWWWWWWW!!!!!");
+			// Console::WriteLine(ScanData);
+			// array<wchar_t>^ Space = { ' ' };
+			array<String^>^ StringArray = ScanData->Split(' ');
+			// Console::WriteLine(StringArray);
+			if (StringArray->Length > 25) {
+				try {
+					double StartAngle = System::Convert::ToInt32(StringArray[23], 16);
+					double Resolution = System::Convert::ToInt32(StringArray[24], 16) / 10000.0;
+					int NumRanges = System::Convert::ToInt32(StringArray[25], 16);
+
+					array<double>^ Range = gcnew array<double>(NumRanges);
+					array<double>^ RangeX = gcnew array<double>(NumRanges);
+					array<double>^ RangeY = gcnew array<double>(NumRanges);
+
+					for (int i = 0; i < NumRanges; i++) {
+						Range[i] = System::Convert::ToInt32(StringArray[26 + i], 16);
+						RangeX[i] = Range[i] * sin(i * Resolution);
+						RangeY[i] = -Range[i] * cos(i * Resolution);
+						Console::WriteLine("X: {0:F3}, Y: {0:F3}", RangeX[i], RangeY[i]);
+					}
+				} catch (System::FormatException^ e) {
+					Console::WriteLine("Format Exception: {0}", e->Message);
+				}
+				catch (Exception^ e) {
+					Console::WriteLine("Error found: {0}", e->Message);
+				}
+			}
 
 			Thread::Sleep(20);
 		}
@@ -117,7 +144,7 @@ error_state Laser::sendCommand(String^ command) {
 		// Stream->WriteByte(0x02);
 		Stream->Write(SendData, 0, SendData->Length);
 		// Stream->WriteByte(0x03);
-		// Threading::Thread::Sleep(10);
+		Threading::Thread::Sleep(10);
 		Stream->Read(ReadData, 0, ReadData->Length);
 		// String^ Response = System::Text::Encoding::ASCII->GetString(ReadData);
 		/*
