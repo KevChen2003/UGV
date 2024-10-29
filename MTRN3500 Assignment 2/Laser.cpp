@@ -30,12 +30,15 @@ void Laser::threadFunction() {
 	// connect once to the laser
 	if (!getShutdownFlag() && connect(WEEDER_ADDRESS, 23000) == error_state::SUCCESS) {
 		Console::WriteLine("Connected to Laser Successfully.");
+		if (sendCommand("5360742\n") == error_state::SUCCESS) {
+			Console::WriteLine("Authentication Successful.");
+		}
 		// configure scan and start measurement
 		// if (communicate("\x02sMN mLMPsetscancfg 5000 1 5000 0 1800000\x03") == error_state::SUCCESS && communicate("\x02sMN LMCstartmeas\x03") == error_state::SUCCESS) {
 		while (!getShutdownFlag()) {
 			Console::WriteLine("Laser Thread is running.");
 			processHeartBeats();
-			// laser functionality 
+			// laser functionality
 			/*
 			if (communicate() == error_state::SUCCESS && checkData() == error_state::SUCCESS) {
 				// if communication is successful and data is successful, put the data in laser shared memory
@@ -45,7 +48,7 @@ void Laser::threadFunction() {
 			// start scanning, setting parameter to 1 enables the continuous transmission of scan data
 			// communicate("\x02sEN LMDscandata 1\x03");
 			// only scan once to not hold up the thread 
-			error_state response = sendCommand("sRN LMDscandata");
+			error_state response = sendCommand("\x02sRN LMDscandata\x03");
 			if (response != error_state::SUCCESS) {
 				Console::WriteLine("Error trying to scan data.");
 				break;
@@ -84,6 +87,7 @@ error_state Laser::processHeartBeats() {
 		if (Watch->ElapsedMilliseconds > CRASH_LIMIT) {
 			// if the laser bit is up and the watch has exceeded the limit
 			// shutdown all threads
+			Console::WriteLine("TMM Failure.");
 			shutdownModules();
 			return error_state::ERR_TMM_FAILURE;
 		}
@@ -110,10 +114,10 @@ error_state Laser::sendCommand(String^ command) {
 	}
 	try {
 		SendData = System::Text::Encoding::ASCII->GetBytes(command);
-		Stream->WriteByte(0x02);
+		// Stream->WriteByte(0x02);
 		Stream->Write(SendData, 0, SendData->Length);
-		Stream->WriteByte(0x03);
-		Threading::Thread::Sleep(10);
+		// Stream->WriteByte(0x03);
+		// Threading::Thread::Sleep(10);
 		Stream->Read(ReadData, 0, ReadData->Length);
 		// String^ Response = System::Text::Encoding::ASCII->GetString(ReadData);
 		/*
@@ -134,18 +138,26 @@ error_state Laser::sendCommand(String^ command) {
 }
 
 error_state Laser::connect(String^ hostName, int portNumber) {
-	// should already connect to it
-	Client = gcnew TcpClient(hostName, portNumber);
-	Stream = Client->GetStream();
-	Client->NoDelay = true;
-	// Client->ReceiveTimeout = 500;
-	Client->SendTimeout = 500;
-	Client->ReceiveBufferSize = 1024;
-	Client->SendBufferSize = 1024;
+	try {
+		// should already connect to it
+		Client = gcnew TcpClient(hostName, portNumber);
+		Stream = Client->GetStream();
+		Client->NoDelay = true;
+		Client->ReceiveTimeout = 5000;
+		Client->SendTimeout = 5000;
+		Client->ReceiveBufferSize = 2048;
+		Client->SendBufferSize = 1024;
 
-	ReadData = gcnew array<unsigned char>(1024);
-	SendData = gcnew array<unsigned char>(1024);
-	return error_state::SUCCESS;
+		ReadData = gcnew array<unsigned char>(2048);
+		SendData = gcnew array<unsigned char>(1024);
+		return error_state::SUCCESS;
+	}
+	catch (Exception^ e) {
+		// Handle exceptions
+		std::string ErrorMessage = msclr::interop::marshal_as<std::string>(e->Message);
+		std::cerr << "Exception when connecting: " << ErrorMessage << '\n';
+		return error_state::ERR_CONNECTION; // Return connection error state
+	}
 }
 
 void Laser::shutdownModules() {
