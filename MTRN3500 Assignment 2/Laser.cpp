@@ -76,6 +76,7 @@ void Laser::threadFunction() {
 
 					for (int i = 0; i < NumRanges; i++) {
 						// X and Y might be mixed up
+						// might not include radians to degree conversion
 						Range[i] = System::Convert::ToInt32(StringArray[26 + i], 16);
 						RangeX[i] = Range[i] * sin(i * Resolution);
 						RangeY[i] = -Range[i] * cos(i * Resolution);
