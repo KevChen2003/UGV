@@ -75,9 +75,10 @@ void Laser::threadFunction() {
 					array<double>^ RangeY = gcnew array<double>(NumRanges);
 
 					for (int i = 0; i < NumRanges; i++) {
-						// X and Y might be mixed up
-						// might not include radians to degree conversion
 						Range[i] = System::Convert::ToInt32(StringArray[26 + i], 16);
+						//
+						// ERROR: USE REAL PI VALUE!!!!!!
+						//
 						RangeX[i] = Range[i] * cos(i * Resolution * 3.1415/180);
 						RangeY[i] = Range[i] * sin(i * Resolution * 3.1415/180);
 						// print out the X and Y
