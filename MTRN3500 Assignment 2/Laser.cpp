@@ -62,7 +62,7 @@ void Laser::threadFunction() {
 			// Console::WriteLine(ScanData);
 			// array<wchar_t>^ Space = { ' ' };
 			array<String^>^ StringArray = ScanData->Split(' ');
-			// Console::WriteLine(StringArray);
+			Console::WriteLine(StringArray);
 			if (StringArray->Length > 25) {
 				try {
 					// point calculation from lectuers
