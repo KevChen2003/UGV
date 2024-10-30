@@ -62,6 +62,7 @@ void Laser::threadFunction() {
 			// Console::WriteLine(StringArray);
 			if (StringArray->Length > 25) {
 				try {
+					// point calculation from lectuers
 					double StartAngle = System::Convert::ToInt32(StringArray[23], 16);
 					double Resolution = System::Convert::ToInt32(StringArray[24], 16) / 10000.0;
 					int NumRanges = System::Convert::ToInt32(StringArray[25], 16);
@@ -74,7 +75,8 @@ void Laser::threadFunction() {
 						Range[i] = System::Convert::ToInt32(StringArray[26 + i], 16);
 						RangeX[i] = Range[i] * sin(i * Resolution);
 						RangeY[i] = -Range[i] * cos(i * Resolution);
-						Console::WriteLine("X: {0:F3}, Y: {0:F3}", RangeX[i], RangeY[i]);
+						// print out the X and Y
+						Console::WriteLine("X: {0:F3}, Y: {1:F3}", RangeX[i], RangeY[i]);
 					}
 				} catch (System::FormatException^ e) {
 					Console::WriteLine("Format Exception: {0}", e->Message);
