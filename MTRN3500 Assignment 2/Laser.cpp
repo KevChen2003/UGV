@@ -48,6 +48,9 @@ void Laser::threadFunction() {
 			// start scanning, setting parameter to 1 enables the continuous transmission of scan data
 			// communicate("\x02sEN LMDscandata 1\x03");
 			// only scan once to not hold up the thread 
+
+			// keep track of how many points have been printed
+			int PointNum = 0;
 			error_state response = sendCommand("\x02sRN LMDscandata\x03");
 			if (response != error_state::SUCCESS) {
 				Console::WriteLine("Error trying to scan data.");
@@ -76,7 +79,7 @@ void Laser::threadFunction() {
 						RangeX[i] = Range[i] * sin(i * Resolution);
 						RangeY[i] = -Range[i] * cos(i * Resolution);
 						// print out the X and Y
-						Console::WriteLine("X: {0:F3}, Y: {1:F3}", RangeX[i], RangeY[i]);
+						Console::WriteLine("Point {0:D}:,  X: {1:F3}, Y: {2:F3}", PointNum++, RangeX[i], RangeY[i]);
 					}
 				} catch (System::FormatException^ e) {
 					Console::WriteLine("Format Exception: {0}", e->Message);
