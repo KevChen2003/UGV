@@ -76,11 +76,10 @@ void Laser::threadFunction() {
 
 					for (int i = 0; i < NumRanges; i++) {
 						Range[i] = System::Convert::ToInt32(StringArray[26 + i], 16);
-						//
-						// ERROR: USE REAL PI VALUE!!!!!!
-						//
-						RangeX[i] = Range[i] * cos(i * Resolution * 3.1415/180);
-						RangeY[i] = Range[i] * sin(i * Resolution * 3.1415/180);
+
+						double pi = Math::PI;
+						RangeX[i] = Range[i] * cos(i * Resolution * pi/180);
+						RangeY[i] = Range[i] * sin(i * Resolution * pi/180);
 						// print out the X and Y
 						Console::WriteLine("Point {0:D}:,  X: {1:F3}, Y: {2:F3}", PointNum++, RangeX[i], RangeY[i]);
 					}
