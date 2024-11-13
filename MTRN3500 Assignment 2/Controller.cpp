@@ -46,8 +46,15 @@ void Controller::threadFunction() {
 		// Console::WriteLine("Controller Thread is running.");
 		processHeartBeats();
 		// Controller functionality 
+
+		// remember to add a xbox button to indicate shutdown
+
 		if (ControllerInterface_->IsConnected()) {
-			ControllerInterface_->printControllerState(ControllerInterface_->GetState());
+			controllerState state = ControllerInterface_->GetState();
+			ControllerInterface_->printControllerState(state);
+			double speed = state.rightTrigger - state.leftTrigger;
+			double steer = state.rightThumbX;
+			Console::WriteLine("Speed: {0}, Steer: {1}", speed, steer);
 			// speed = right trigger - left trigger
 			// steer = right thumb x
 		}
