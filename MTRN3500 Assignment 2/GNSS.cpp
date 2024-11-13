@@ -25,7 +25,7 @@ void GNSS::threadFunction() {
 	// start stopwatch
 	Watch->Start();
 	while (!getShutdownFlag()) {
-		Console::WriteLine("GNSS Thread is running.");
+		// Console::WriteLine("GNSS Thread is running.");
 		processHeartBeats();
 		// GNSS functionality 
 		if (communicate() == error_state::SUCCESS && checkData() == error_state::SUCCESS) {

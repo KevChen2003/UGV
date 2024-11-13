@@ -35,7 +35,7 @@ void CrashAvoidance::threadFunction() {
 	// start stopwatch
 	Watch->Start();
 	while (!getShutdownFlag()) {
-		Console::WriteLine("CrashAvoidance Thread is running.");
+		// Console::WriteLine("CrashAvoidance Thread is running.");
 		processHeartBeats();
 		// CrashAvoidance functionality 
 		Thread::Sleep(20);

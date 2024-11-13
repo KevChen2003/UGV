@@ -40,7 +40,7 @@ void VC::threadFunction() {
 	// start stopwatch
 	Watch->Start();
 	while (!getShutdownFlag()) {
-		Console::WriteLine("VC Thread is running.");
+		// Console::WriteLine("VC Thread is running.");
 		processHeartBeats();
 		// VC functionality 
 		/*

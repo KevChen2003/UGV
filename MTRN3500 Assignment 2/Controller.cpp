@@ -43,7 +43,7 @@ void Controller::threadFunction() {
 	// start stopwatch
 	Watch->Start();
 	while (!getShutdownFlag()) {
-		Console::WriteLine("Controller Thread is running.");
+		// Console::WriteLine("Controller Thread is running.");
 		processHeartBeats();
 		// Controller functionality 
 		if (ControllerInterface_->IsConnected()) {

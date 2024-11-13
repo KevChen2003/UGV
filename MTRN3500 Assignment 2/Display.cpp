@@ -39,7 +39,7 @@ void Display::threadFunction() {
 	// start stopwatch
 	Watch->Start();
 	while (!getShutdownFlag()) {
-		Console::WriteLine("Display Thread is running.");
+		// Console::WriteLine("Display Thread is running.");
 		processHeartBeats();
 		// Display functionality 
 		/*

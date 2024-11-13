@@ -36,7 +36,7 @@ void Laser::threadFunction() {
 		// configure scan and start measurement
 		// if (communicate("\x02sMN mLMPsetscancfg 5000 1 5000 0 1800000\x03") == error_state::SUCCESS && communicate("\x02sMN LMCstartmeas\x03") == error_state::SUCCESS) {
 		while (!getShutdownFlag()) {
-			Console::WriteLine("Laser Thread is running.");
+			// Console::WriteLine("Laser Thread is running.");
 			processHeartBeats();
 			// laser functionality
 			/*

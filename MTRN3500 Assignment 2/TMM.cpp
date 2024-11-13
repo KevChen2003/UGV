@@ -72,7 +72,7 @@ void ThreadManagement::threadFunction() {
 				break;
 			}
 		}
-		Console::WriteLine("TMT Thread is running");
+		// Console::WriteLine("TMT Thread is running");
 		processHeartBeats();
 		Thread::Sleep(50);
 	}
