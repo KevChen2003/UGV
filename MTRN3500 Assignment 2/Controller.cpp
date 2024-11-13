@@ -52,11 +52,13 @@ void Controller::threadFunction() {
 		if (ControllerInterface_->IsConnected()) {
 			controllerState state = ControllerInterface_->GetState();
 			ControllerInterface_->printControllerState(state);
+			// speed = right trigger - left trigger
+			// steer = right thumb x
 			double speed = state.rightTrigger - state.leftTrigger;
 			double steer = state.rightThumbX;
 			Console::WriteLine("Speed: {0}, Steer: {1}", speed, steer);
-			// speed = right trigger - left trigger
-			// steer = right thumb x
+
+			// next, send the values over to VC, who should send it to control the robot's movements
 		}
 		Thread::Sleep(20);
 	}
