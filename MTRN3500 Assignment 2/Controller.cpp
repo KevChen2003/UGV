@@ -48,6 +48,8 @@ void Controller::threadFunction() {
 		// Controller functionality 
 		if (ControllerInterface_->IsConnected()) {
 			ControllerInterface_->printControllerState(ControllerInterface_->GetState());
+			// speed = right trigger - left trigger
+			// steer = right thumb x
 		}
 		Thread::Sleep(20);
 	}
