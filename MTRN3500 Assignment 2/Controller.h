@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ControllerInterface.h>
 #include <UGVModule.h>
 
 using namespace System;
@@ -37,4 +38,5 @@ private:
     SM_Laser^ SM_Laser_;
     SM_GPS^ SM_Gps_;
     Stopwatch^ Watch;
+    ControllerInterface* ControllerInterface_;
 };

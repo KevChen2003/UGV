@@ -62,7 +62,7 @@ void Laser::threadFunction() {
 			// Console::WriteLine(ScanData);
 			// array<wchar_t>^ Space = { ' ' };
 			array<String^>^ StringArray = ScanData->Split(' ');
-			Console::WriteLine(StringArray);
+			// Console::WriteLine(StringArray);
 			if (StringArray->Length > 25) {
 				try {
 					// point calculation from lectuers
@@ -81,7 +81,7 @@ void Laser::threadFunction() {
 						RangeX[i] = Range[i] * cos(i * Resolution * pi/180);
 						RangeY[i] = Range[i] * sin(i * Resolution * pi/180);
 						// print out the X and Y
-						Console::WriteLine("Point {0:D}:,  X: {1:F3}, Y: {2:F3}", PointNum++, RangeX[i], RangeY[i]);
+						// Console::WriteLine("Point {0:D}:,  X: {1:F3}, Y: {2:F3}", PointNum++, RangeX[i], RangeY[i]);
 					}
 				} catch (System::FormatException^ e) {
 					Console::WriteLine("Format Exception: {0}", e->Message);

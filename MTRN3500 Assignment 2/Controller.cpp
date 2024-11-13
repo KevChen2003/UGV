@@ -8,7 +8,10 @@ Controller::Controller(SM_ThreadManagement^ SM_TM, SM_Laser^ SM_Laser, SM_GPS^ S
 	SM_Gps_ = SM_Gps;
 }
 
-Controller::~Controller() {}
+Controller::~Controller() {
+	// clean up native ptr
+	delete ControllerInterface_;
+}
 
 error_state Controller::setupSharedMemory() {
 	return error_state::SUCCESS;
@@ -30,6 +33,11 @@ void Controller::threadFunction() {
 	Console::WriteLine("Controller Thread is starting.");
 	// initialise stopwatch
 	Watch = gcnew Stopwatch;
+	// initialise controller interface
+	// 1st param = xbox player num
+	// 2nd param = 0 if xbox control, 1 if keyboard
+	ControllerInterface_ = new ControllerInterface(1, 0);
+
 	// wait at the barrier for other threads
 	SM_TM_->ThreadBarrier->SignalAndWait();
 	// start stopwatch
@@ -38,6 +46,9 @@ void Controller::threadFunction() {
 		Console::WriteLine("Controller Thread is running.");
 		processHeartBeats();
 		// Controller functionality 
+		if (ControllerInterface_->IsConnected()) {
+			ControllerInterface_->printControllerState(ControllerInterface_->GetState());
+		}
 		Thread::Sleep(20);
 	}
 	Console::WriteLine("Controller Thread is terminating.");
