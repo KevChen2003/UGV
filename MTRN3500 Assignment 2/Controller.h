@@ -40,4 +40,6 @@ private:
     SM_VehicleControl^ SM_VC_;
     Stopwatch^ Watch;
     ControllerInterface* ControllerInterface_;
+    double speed;
+    double steer;
 };

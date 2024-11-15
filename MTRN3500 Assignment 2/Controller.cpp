@@ -19,6 +19,15 @@ error_state Controller::setupSharedMemory() {
 }
 
 error_state Controller::processSharedMemory() {
+	// use the lock for reading and writing ONLY
+	Monitor::Enter(SM_VC_->lockObject);
+	try {
+		SM_VC_->Speed = speed;
+		SM_VC_->Steering = steer;
+	}
+	finally {
+		Monitor::Exit(SM_VC_->lockObject);
+	}
 	return error_state::SUCCESS;
 }
 
@@ -42,8 +51,6 @@ void Controller::threadFunction() {
 	// wait at the barrier for other threads
 	SM_TM_->ThreadBarrier->SignalAndWait();
 	// start stopwatch
-	double speed;
-	double steer;
 	Watch->Start();
 	while (!getShutdownFlag()) {
 		// Console::WriteLine("Controller Thread is running.");
@@ -66,7 +73,7 @@ void Controller::threadFunction() {
 			steer = 0;
 		}
 		// next, send the values over to VC, who should send it to control the robot's movements
-
+		processSharedMemory();
 		Thread::Sleep(20);
 	}
 	Console::WriteLine("Controller Thread is terminating.");

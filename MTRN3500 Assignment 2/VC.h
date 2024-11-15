@@ -7,7 +7,7 @@ public:
 
 	VC();
 
-	VC(SM_ThreadManagement^ SM_TM, SM_Laser^ SM_Laser, SM_GPS^ SM_Gps);
+	VC(SM_ThreadManagement^ SM_TM, SM_Laser^ SM_Laser, SM_GPS^ SM_Gps, SM_VehicleControl^ SM_VC);
 
 	error_state processSharedMemory() override;
 
@@ -22,6 +22,8 @@ public:
 	virtual error_state connect(String^ hostName, int portNumber) override;
 	virtual error_state communicate() override;
 
+	error_state sendCommand(String^ command);
+
 	~VC();
 
 private:
@@ -29,5 +31,10 @@ private:
 	SM_ThreadManagement^ SM_TM_;
 	SM_Laser^ SM_Laser_;
 	SM_GPS^ SM_Gps_;
+	SM_VehicleControl^ SM_VC_;
 	Stopwatch^ Watch;
+	array<unsigned char>^ SendData;		// array for sending data
+	double speed; 
+	double steer;
+	int wdog;
 };
