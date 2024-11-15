@@ -2,10 +2,11 @@
 
 Controller::Controller() {}
 
-Controller::Controller(SM_ThreadManagement^ SM_TM, SM_Laser^ SM_Laser, SM_GPS^ SM_Gps) {
+Controller::Controller(SM_ThreadManagement^ SM_TM, SM_Laser^ SM_Laser, SM_GPS^ SM_Gps, SM_VehicleControl^ SM_VC) {
 	SM_TM_ = SM_TM;
 	SM_Laser_ = SM_Laser;
 	SM_Gps_ = SM_Gps;
+	SM_VC_ = SM_VC;
 }
 
 Controller::~Controller() {
@@ -36,11 +37,13 @@ void Controller::threadFunction() {
 	// initialise controller interface
 	// 1st param = xbox player num
 	// 2nd param = 0 if xbox control, 1 if keyboard
-	ControllerInterface_ = new ControllerInterface(1, 0);
+	ControllerInterface_ = new ControllerInterface(1, 1);
 
 	// wait at the barrier for other threads
 	SM_TM_->ThreadBarrier->SignalAndWait();
 	// start stopwatch
+	double speed;
+	double steer;
 	Watch->Start();
 	while (!getShutdownFlag()) {
 		// Console::WriteLine("Controller Thread is running.");
@@ -48,18 +51,22 @@ void Controller::threadFunction() {
 		// Controller functionality 
 
 		// remember to add a xbox button to indicate shutdown
-
 		if (ControllerInterface_->IsConnected()) {
 			controllerState state = ControllerInterface_->GetState();
 			ControllerInterface_->printControllerState(state);
 			// speed = right trigger - left trigger
 			// steer = right thumb x
-			double speed = state.rightTrigger - state.leftTrigger;
-			double steer = state.rightThumbX;
+			speed = state.rightTrigger - state.leftTrigger;
+			steer = state.rightThumbX;
 			Console::WriteLine("Speed: {0}, Steer: {1}", speed, steer);
 
-			// next, send the values over to VC, who should send it to control the robot's movements
 		}
+		else {
+			speed = 0;
+			steer = 0;
+		}
+		// next, send the values over to VC, who should send it to control the robot's movements
+
 		Thread::Sleep(20);
 	}
 	Console::WriteLine("Controller Thread is terminating.");

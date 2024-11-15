@@ -12,7 +12,7 @@ public:
 
     Controller();
     
-    Controller(SM_ThreadManagement^ SM_TM, SM_Laser^ SM_Laser, SM_GPS^ SM_Gps);
+    Controller(SM_ThreadManagement^ SM_TM, SM_Laser^ SM_Laser, SM_GPS^ SM_Gps, SM_VehicleControl^ SM_VC);
 
     ~Controller();
 
@@ -37,6 +37,7 @@ private:
     SM_ThreadManagement^ SM_TM_;
     SM_Laser^ SM_Laser_;
     SM_GPS^ SM_Gps_;
+    SM_VehicleControl^ SM_VC_;
     Stopwatch^ Watch;
     ControllerInterface* ControllerInterface_;
 };
