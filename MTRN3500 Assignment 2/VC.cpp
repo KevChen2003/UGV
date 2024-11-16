@@ -32,10 +32,50 @@ bool VC::getShutdownFlag() {
 
 
 error_state VC::connect(String^ hostName, int portNumber) {
-	return error_state::SUCCESS;
+	try {
+		// should already connect to it
+		Client = gcnew TcpClient(hostName, portNumber);
+		Stream = Client->GetStream();
+		Client->NoDelay = true;
+		Client->ReceiveTimeout = 5000;
+		Client->SendTimeout = 5000;
+		Client->ReceiveBufferSize = 2048;
+		Client->SendBufferSize = 1024;
+
+		ReadData = gcnew array<unsigned char>(2048);
+		SendData = gcnew array<unsigned char>(1024);
+
+		SendData = System::Text::Encoding::ASCII->GetBytes("5360742\n");
+		Stream->Write(SendData, 0, SendData->Length);
+		Threading::Thread::Sleep(10);
+		return error_state::SUCCESS;
+	}
+	catch (Exception^ e) {
+		// Handle exceptions
+		std::string ErrorMessage = msclr::interop::marshal_as<std::string>(e->Message);
+		std::cerr << "Exception when connecting: " << ErrorMessage << '\n';
+		return error_state::ERR_CONNECTION; // Return connection error state
+	}
 }
 error_state VC::communicate() {
-	return error_state::SUCCESS;
+	if (Client == nullptr || Stream == nullptr) {
+		Console::WriteLine("Connection Error.");
+		return error_state::ERR_CONNECTION;
+	}
+	try {
+		double steerVal = steer * 40.0;
+		String^ command = String::Format("# {0} {1} {2} #", steerVal, speed, wdog);
+		// keep wdog alternating
+		wdog = ~wdog;
+		SendData = System::Text::Encoding::ASCII->GetBytes(command);
+		Stream->Write(SendData, 0, SendData->Length);
+		return error_state::SUCCESS;
+	}
+	catch (Exception^ e) {
+		std::string ErrorMessage = msclr::interop::marshal_as<std::string>(e->Message);
+		std::cerr << "Exception found when sending command: " << ErrorMessage << '\n';
+		return error_state::ERR_RESPONSE;
+	}
 }
 
 VC::~VC() {};
@@ -55,19 +95,13 @@ void VC::threadFunction() {
 	// set watdog as 0
 	wdog = 0;
 	if (!getShutdownFlag() && connect(WEEDER_ADDRESS, 25000) == error_state::SUCCESS) {
-		Console::WriteLine("Connected to VC Successfully.");
-		if (sendCommand("5360742\n") == error_state::SUCCESS) {
-			Console::WriteLine("Authentication Successful.");
-		}
+		Console::WriteLine("Connected to VC Successfully + Authenticated.");
 		while (!getShutdownFlag()) {
 			// Console::WriteLine("VC Thread is running.");
 			processHeartBeats();
 			// VC functionality 
 			processSharedMemory();
-			double steerVal = steer * 40.0;
-			String^ command = String::Format("# {0} {1} {2} #", steerVal, speed, wdog);
-			// keep wdog alternating
-			wdog = ~wdog;
+			communicate();
 			/*
 			if (communicate() == error_state::SUCCESS) {
 				// if communication is successful and data is successful, put the data in Display shared memory
@@ -80,34 +114,6 @@ void VC::threadFunction() {
 	Console::WriteLine("VC Thread is terminating.");
 }
 
-error_state VC::sendCommand(String^ command) {
-	if (Client == nullptr || Stream == nullptr) {
-		return error_state::ERR_CONNECTION;
-	}
-	try {
-		SendData = System::Text::Encoding::ASCII->GetBytes(command);
-		// Stream->WriteByte(0x02);
-		Stream->Write(SendData, 0, SendData->Length);
-		// Stream->WriteByte(0x03);
-		Threading::Thread::Sleep(10);
-		Stream->Read(ReadData, 0, ReadData->Length);
-		// String^ Response = System::Text::Encoding::ASCII->GetString(ReadData);
-		/*
-		// honestly probably not needed, seems like the exception is already caught
-		for (int i = 0; i < Response->Length; i++) {
-			if (Response[i] == '?') {
-				throw gcnew Exception("Unknown Command.");
-			}
-		}
-		*/
-		return error_state::SUCCESS;
-	}
-	catch (Exception^ e) {
-		std::string ErrorMessage = msclr::interop::marshal_as<std::string>(e->Message);
-		std::cerr << "Exception found when sending command: " << ErrorMessage << '\n';
-		return error_state::ERR_RESPONSE;
-	}
-}
 
 error_state VC::processHeartBeats() {
 	if ((SM_TM_->heartbeat & bit_VC) == 0) {

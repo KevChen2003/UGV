@@ -29,29 +29,17 @@ void Laser::threadFunction() {
 	Watch->Start();
 	// connect once to the laser
 	if (!getShutdownFlag() && connect(WEEDER_ADDRESS, 23000) == error_state::SUCCESS) {
-		Console::WriteLine("Connected to Laser Successfully.");
-		if (sendCommand("5360742\n") == error_state::SUCCESS) {
-			Console::WriteLine("Authentication Successful.");
-		}
-		// configure scan and start measurement
-		// if (communicate("\x02sMN mLMPsetscancfg 5000 1 5000 0 1800000\x03") == error_state::SUCCESS && communicate("\x02sMN LMCstartmeas\x03") == error_state::SUCCESS) {
+		Console::WriteLine("Connected to Laser Successfully + Authenticated.");
 		while (!getShutdownFlag()) {
-			// Console::WriteLine("Laser Thread is running.");
 			processHeartBeats();
-			// laser functionality
-			/*
-			if (communicate() == error_state::SUCCESS && checkData() == error_state::SUCCESS) {
-				// if communication is successful and data is successful, put the data in laser shared memory
-				processSharedMemory();
-			}
-			*/
 			// start scanning, setting parameter to 1 enables the continuous transmission of scan data
 			// communicate("\x02sEN LMDscandata 1\x03");
 			// only scan once to not hold up the thread 
 
 			// keep track of how many points have been printed
 			int PointNum = 0;
-			error_state response = sendCommand("\x02sRN LMDscandata\x03");
+			error_state response = communicate();
+
 			if (response != error_state::SUCCESS) {
 				Console::WriteLine("Error trying to scan data.");
 				break;
@@ -155,29 +143,15 @@ error_state Laser::processSharedMemory() {
 }
 
 error_state Laser::communicate() {
-	return error_state::SUCCESS;
-}
-
-error_state Laser::sendCommand(String^ command) {
 	if (Client == nullptr || Stream == nullptr) {
 		return error_state::ERR_CONNECTION;
 	}
 	try {
-		SendData = System::Text::Encoding::ASCII->GetBytes(command);
-		// Stream->WriteByte(0x02);
+		SendData = System::Text::Encoding::ASCII->GetBytes("\x02sRN LMDscandata\x03");
 		Stream->Write(SendData, 0, SendData->Length);
-		// Stream->WriteByte(0x03);
-		Threading::Thread::Sleep(10);
+		// increase delay to remove trhe string error, but this delays the sim more
+		Threading::Thread::Sleep(20);
 		Stream->Read(ReadData, 0, ReadData->Length);
-		// String^ Response = System::Text::Encoding::ASCII->GetString(ReadData);
-		/*
-		// honestly probably not needed, seems like the exception is already caught
-		for (int i = 0; i < Response->Length; i++) {
-			if (Response[i] == '?') {
-				throw gcnew Exception("Unknown Command.");
-			}
-		}
-		*/
 		return error_state::SUCCESS;
 	}
 	catch (Exception^ e) {
@@ -200,6 +174,10 @@ error_state Laser::connect(String^ hostName, int portNumber) {
 
 		ReadData = gcnew array<unsigned char>(2048);
 		SendData = gcnew array<unsigned char>(1024);
+
+		SendData = System::Text::Encoding::ASCII->GetBytes("5360742\n");
+		Stream->Write(SendData, 0, SendData->Length);
+		Threading::Thread::Sleep(10);
 		return error_state::SUCCESS;
 	}
 	catch (Exception^ e) {

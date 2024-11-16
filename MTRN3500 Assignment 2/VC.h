@@ -22,8 +22,6 @@ public:
 	virtual error_state connect(String^ hostName, int portNumber) override;
 	virtual error_state communicate() override;
 
-	error_state sendCommand(String^ command);
-
 	~VC();
 
 private:
