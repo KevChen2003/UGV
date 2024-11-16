@@ -63,6 +63,8 @@ void Laser::threadFunction() {
 			// array<wchar_t>^ Space = { ' ' };
 			array<String^>^ StringArray = ScanData->Split(' ');
 			// Console::WriteLine(StringArray);
+
+			// validate the data before using it
 			if (StringArray->Length > 25) {
 				try {
 					// point calculation from lectuers
@@ -71,8 +73,8 @@ void Laser::threadFunction() {
 					int NumRanges = System::Convert::ToInt32(StringArray[25], 16);
 
 					array<double>^ Range = gcnew array<double>(NumRanges);
-					array<double>^ RangeX = gcnew array<double>(NumRanges);
-					array<double>^ RangeY = gcnew array<double>(NumRanges);
+					RangeX = gcnew array<double>(NumRanges);
+					RangeY = gcnew array<double>(NumRanges);
 
 					for (int i = 0; i < NumRanges; i++) {
 						Range[i] = System::Convert::ToInt32(StringArray[26 + i], 16);
@@ -82,6 +84,9 @@ void Laser::threadFunction() {
 						RangeY[i] = Range[i] * sin(i * Resolution * pi/180);
 						// print out the X and Y
 						// Console::WriteLine("Point {0:D}:,  X: {1:F3}, Y: {2:F3}", PointNum++, RangeX[i], RangeY[i]);
+
+						// send it to Display
+
 					}
 				} catch (System::FormatException^ e) {
 					Console::WriteLine("Format Exception: {0}", e->Message);
@@ -135,6 +140,17 @@ error_state Laser::checkData() {
 
 // Send/Recieve data from shared memory structures
 error_state Laser::processSharedMemory() {
+	// Enter the monitor to ensure thread-safe access
+	Monitor::Enter(SM_Laser_->lockObject);
+	try {
+		// set the x and y values
+		SM_Laser_->x = RangeX;
+		SM_Laser_->y = RangeY;
+	}
+	finally {
+		// Exit the monitor
+		Monitor::Exit(SM_Laser_->lockObject);
+	}
 	return error_state::SUCCESS;
 }
 

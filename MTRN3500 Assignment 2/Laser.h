@@ -45,5 +45,7 @@ private:
     SM_GPS^ SM_Gps_;
     SM_Laser^ SM_Laser_;
     Stopwatch^ Watch;
+    array<double>^ RangeX;
+    array<double>^ RangeY;
     array<unsigned char>^ SendData;		// array for sending data
 };
