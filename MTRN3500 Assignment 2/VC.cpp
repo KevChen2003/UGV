@@ -102,13 +102,7 @@ void VC::threadFunction() {
 			// VC functionality 
 			processSharedMemory();
 			communicate();
-			/*
-			if (communicate() == error_state::SUCCESS) {
-				// if communication is successful and data is successful, put the data in Display shared memory
-				processSharedMemory();
-			}
-			*/
-			Thread::Sleep(20);
+			Thread::Sleep(10);
 		}
 	}
 	Console::WriteLine("VC Thread is terminating.");

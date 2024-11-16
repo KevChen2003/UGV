@@ -7,8 +7,6 @@ Laser::Laser(SM_ThreadManagement^ SM_TM, SM_Laser^ SM_Laser, SM_GPS^ SM_Gps) {
 	SM_TM_ = SM_TM;
 	SM_Laser_ = SM_Laser;
 	SM_Gps_ = SM_Gps;
-	// not sure if stopwatch required below as its intiialised in the thread function again later
-	//Watch = gcnew Stopwatch;
 }
 
 error_state Laser::setupSharedMemory() {
@@ -74,7 +72,7 @@ void Laser::threadFunction() {
 						// Console::WriteLine("Point {0:D}:,  X: {1:F3}, Y: {2:F3}", PointNum++, RangeX[i], RangeY[i]);
 
 						// send it to Display
-
+						processSharedMemory();
 					}
 				} catch (System::FormatException^ e) {
 					Console::WriteLine("Format Exception: {0}", e->Message);
@@ -84,14 +82,8 @@ void Laser::threadFunction() {
 				}
 			}
 
-			Thread::Sleep(20);
+			Thread::Sleep(10);
 		}
-		/*
-		}
-		else {
-			Console::WriteLine("Failed to configure scan, or start measurement.");
-		}
-		*/ 
 	}
 	// stop measurement
 	/*

@@ -30,4 +30,6 @@ private:
 	SM_Laser^ SM_Laser_;
 	SM_GPS^ SM_Gps_;
 	Stopwatch^ Watch;
+	array<double>^ RangeX;
+	array<double>^ RangeY;
 };

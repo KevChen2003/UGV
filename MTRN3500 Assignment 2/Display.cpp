@@ -1,3 +1,4 @@
+#include <msclr/marshal_cppstd.h>
 #include "Display.h"
 #include <NetworkedModule.h>
 
@@ -10,6 +11,17 @@ Display::Display(SM_ThreadManagement^ SM_TM, SM_Laser^ SM_Laser, SM_GPS^ SM_Gps)
 }
 
 error_state Display::processSharedMemory() {
+	// Enter the monitor to ensure thread-safe access
+	Monitor::Enter(SM_Laser_->lockObject);
+	try {
+		// set the x and y values
+		RangeX = SM_Laser_->x;
+		RangeY = SM_Laser_->y;
+	}
+	finally {
+		// Exit the monitor
+		Monitor::Exit(SM_Laser_->lockObject);
+	}
 	return error_state::SUCCESS;
 }
 
@@ -18,9 +30,42 @@ bool Display::getShutdownFlag() {
 }
 
 error_state Display::connect(String^ hostName, int portNumber) {
-	return error_state::SUCCESS;
+	try {
+		// should already connect to it
+		Client = gcnew TcpClient(hostName, portNumber);
+		Stream = Client->GetStream();
+		Client->NoDelay = true;
+		Client->ReceiveTimeout = 5000;
+		Client->SendTimeout = 5000;
+		Client->ReceiveBufferSize = 2048;
+		Client->SendBufferSize = 1024;
+
+		ReadData = gcnew array<unsigned char>(2048);
+
+		return error_state::SUCCESS;
+	}
+	catch (Exception^ e) {
+		// Handle exceptions
+		std::string ErrorMessage = msclr::interop::marshal_as<std::string>(e->Message);
+		std::cerr << "Exception when connecting: " << ErrorMessage << '\n';
+		return error_state::ERR_CONNECTION; // Return connection error state
+	}
 }
 error_state Display::communicate() {
+	// adapted from appendix B
+	// serialise data array to byte array
+	//Console::WriteLine(RangeX);
+	//Console::WriteLine(RangeY);
+	array<Byte>^ dataX = gcnew array<Byte>(RangeX->Length * sizeof(double));
+	Buffer::BlockCopy(RangeX, 0, dataX, 0, dataX->Length);
+
+	array<Byte>^ dataY = gcnew array<Byte>(RangeY->Length * sizeof(double));
+	Buffer::BlockCopy(RangeY, 0, dataY, 0, dataY->Length);
+
+	// send byte data over connection
+	Stream->Write(dataX, 0, dataX->Length);
+	Thread::Sleep(10);
+	Stream->Write(dataY, 0, dataY->Length);
 	return error_state::SUCCESS;
 }
 
@@ -38,17 +83,16 @@ void Display::threadFunction() {
 	SM_TM_->ThreadBarrier->SignalAndWait();
 	// start stopwatch
 	Watch->Start();
-	while (!getShutdownFlag()) {
-		// Console::WriteLine("Display Thread is running.");
-		processHeartBeats();
-		// Display functionality 
-		/*
-		if (communicate() == error_state::SUCCESS) {
-			// if communication is successful and data is successful, put the data in Display shared memory
+	if (!getShutdownFlag() && connect("127.0.0.1", 28000) == error_state::SUCCESS) {
+		Console::WriteLine("Connected to Display Successfully.");
+		while (!getShutdownFlag()) {
+			// Console::WriteLine("Display Thread is running.");
+			processHeartBeats();
+			// Display functionality
 			processSharedMemory();
+			communicate();
+			Thread::Sleep(10);
 		}
-		*/
-		Thread::Sleep(20);
 	}
 	Console::WriteLine("Display Thread is terminating.");
 }
