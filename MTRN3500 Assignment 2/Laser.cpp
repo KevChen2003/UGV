@@ -69,7 +69,7 @@ void Laser::threadFunction() {
 						RangeX[i] = Range[i] * cos(i * Resolution * pi/180);
 						RangeY[i] = Range[i] * sin(i * Resolution * pi/180);
 						// print out the X and Y
-						// Console::WriteLine("Point {0:D}:,  X: {1:F3}, Y: {2:F3}", PointNum++, RangeX[i], RangeY[i]);
+						//Console::WriteLine("Point {0:D}:  X: {1:F3}, Y: {2:F3}", PointNum++, RangeX[i], RangeY[i]);
 
 						// send it to Display
 						processSharedMemory();

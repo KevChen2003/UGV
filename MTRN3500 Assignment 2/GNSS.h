@@ -13,7 +13,7 @@ using namespace System::Diagnostics;
 
 #pragma pack(push, 4)
 struct GNSSData {
-    unsigned int header; // 4 bytes: 0xAA 0x44 0x12 0x1C
+    // unsigned int header; // 4 bytes: 0xAA 0x44 0x12 0x1C
     unsigned char Discards1[40];
     double Northing;
     double Easting;
@@ -62,4 +62,10 @@ private:
     SM_Laser^ SM_Laser_;
     SM_GPS^ SM_Gps_;
     Stopwatch^ Watch;
+    unsigned char* GNSSNativeArray;
+    double Northing;
+    double Easting;
+    double Height;
+    unsigned int CRC;
+    unsigned int CalculatedCRC;
 };

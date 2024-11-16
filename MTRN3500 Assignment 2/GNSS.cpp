@@ -32,8 +32,11 @@ void GNSS::threadFunction() {
 			processHeartBeats();
 			// GNSS functionality 
 			if (communicate() == error_state::SUCCESS && checkData() == error_state::SUCCESS) {
-				// if communication is successful and data is successful, put the data in laser shared memory
+				// if communication is successful and data is successful, put the data in GNSS shared memory
 				processSharedMemory();
+
+				// print values
+				Console::WriteLine("Northing: {0}, Easting: {1}, Height: {2}, Received CRC: {3}, Calculated CRC: {4}", Northing, Easting, Height, CRC, CalculatedCRC);
 			}
 			Thread::Sleep(20);
 		}
@@ -62,6 +65,23 @@ error_state GNSS::processHeartBeats() {
 
 error_state GNSS::checkData() {
 	// ensure calculated checksum and checksum sent from bytes are correct
+	/*
+	// convert between managed array ReadData to native array
+	pin_ptr<unsigned char> PinnedArray = &ReadData[0];
+	unsigned char* NativeArray = PinnedArray;
+	// gives data size as ReadData is an array of chars anyway which is 1 byte each
+	unsigned long DataSize = static_cast<unsigned long>(ReadData->Length);
+	unsigned long crc = CalculateBlockCRC32(DataSize, NativeArray);
+	*/
+
+	unsigned long DataSizeWithoutCRC = sizeof(GNSSData) - 4; // -4 to remove CRC data
+
+	CalculatedCRC = CalculateBlockCRC32(DataSizeWithoutCRC, GNSSNativeArray);
+	if (CalculatedCRC != CRC) {
+		Console::WriteLine("CRC do not match. Calculated: {0}, Received: {1}", CalculatedCRC, CRC);
+		return error_state::ERR_INVALID_DATA;
+	}
+
 	return error_state::SUCCESS;
 }
 
@@ -97,7 +117,35 @@ error_state GNSS::communicate() {
 		return error_state::ERR_CONNECTION;
 	}
 	try {
-		Stream->Read(ReadData, 0, ReadData->Length);
+		// Stream->Read(ReadData, 0, ReadData->Length);
+
+		unsigned int Header = 0;
+		Byte Data;
+		do {
+			Data = Stream->ReadByte();
+			Header = (Header << 8) | Data;
+		} while (Header != 0xaa44121c);
+
+		GNSSData GNSSStruct;
+
+		// read 108 bytes of data into GNSS Struct
+		array<unsigned char>^ buffer = gcnew array<unsigned char>(108);
+		int bytesRead = Stream->Read(buffer, 0, buffer->Length);
+		// Ensure we've read all 108 bytes
+		if (bytesRead != 108) {
+			Console::WriteLine("Error: Could not read 108 bytes of data.");
+			return error_state::ERR_RESPONSE;
+		}
+		// Pin the buffer and copy the data into the GNSSData struct
+		pin_ptr<unsigned char> pinnedBuffer = &buffer[0];
+		GNSSNativeArray = pinnedBuffer;
+		memcpy(&GNSSStruct, pinnedBuffer, sizeof(GNSSData));
+
+		CRC = GNSSStruct.CRC;
+		Northing = GNSSStruct.Northing;
+		Easting = GNSSStruct.Easting;
+		Height = GNSSStruct.Height;
+
 		return error_state::SUCCESS;
 	}
 	catch (Exception^ e) {
