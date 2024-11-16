@@ -86,6 +86,18 @@ error_state GNSS::checkData() {
 }
 
 error_state GNSS::processSharedMemory() {
+	// Enter the monitor to ensure thread-safe access
+	Monitor::Enter(SM_Gps_->lockObject);
+	try {
+		// set the northing, easting and height
+		SM_Gps_->Northing = Northing;
+		SM_Gps_->Easting = Easting;
+		SM_Gps_->Height = Height;
+	}
+	finally {
+		// Exit the monitor
+		Monitor::Exit(SM_Gps_->lockObject);
+	}
 	return error_state::SUCCESS;
 }
 
