@@ -9,6 +9,20 @@ using namespace System;
 using namespace System::Threading;
 using namespace System::Diagnostics;
 
+#define CRC32_POLYNOMIAL 0xEDB88320L
+
+#pragma pack(push, 4)
+struct GNSSData {
+    unsigned int header; // 4 bytes: 0xAA 0x44 0x12 0x1C
+    unsigned char Discards1[40];
+    double Northing;
+    double Easting;
+    double Height;
+    unsigned char Discards2[40];
+    unsigned int CRC;
+};
+#pragma pack(pop, 4)
+
 ref class GNSS : public NetworkedModule {
 public:
 
@@ -35,6 +49,10 @@ public:
 
     virtual error_state connect(String^ hostName, int portNumber) override;
     virtual error_state communicate() override;
+
+    // from appendix A
+    unsigned long CRC32Value(int i);
+    unsigned long CalculateBlockCRC32(unsigned long ulCount, unsigned char* ucBuffer);
 
     ~GNSS();
 

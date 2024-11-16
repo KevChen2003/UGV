@@ -1,3 +1,4 @@
+#include <msclr/marshal_cppstd.h>
 #include "GNSS.h"
 
 GNSS::GNSS() {}
@@ -24,15 +25,18 @@ void GNSS::threadFunction() {
 	SM_TM_->ThreadBarrier->SignalAndWait();
 	// start stopwatch
 	Watch->Start();
-	while (!getShutdownFlag()) {
-		// Console::WriteLine("GNSS Thread is running.");
-		processHeartBeats();
-		// GNSS functionality 
-		if (communicate() == error_state::SUCCESS && checkData() == error_state::SUCCESS) {
-			// if communication is successful and data is successful, put the data in laser shared memory
-			processSharedMemory();
+	if (!getShutdownFlag() && connect(WEEDER_ADDRESS, 24000) == error_state::SUCCESS) {
+		Console::WriteLine("Connected to GNSS Successfully.");
+		while (!getShutdownFlag()) {
+			// Console::WriteLine("GNSS Thread is running.");
+			processHeartBeats();
+			// GNSS functionality 
+			if (communicate() == error_state::SUCCESS && checkData() == error_state::SUCCESS) {
+				// if communication is successful and data is successful, put the data in laser shared memory
+				processSharedMemory();
+			}
+			Thread::Sleep(20);
 		}
-		Thread::Sleep(20);
 	}
 	Console::WriteLine("GNSS Thread is terminating.");
 }
@@ -57,6 +61,7 @@ error_state GNSS::processHeartBeats() {
 
 
 error_state GNSS::checkData() {
+	// ensure calculated checksum and checksum sent from bytes are correct
 	return error_state::SUCCESS;
 }
 
@@ -67,12 +72,73 @@ error_state GNSS::processSharedMemory() {
 GNSS::~GNSS() {}
 
 error_state GNSS::connect(String^ hostName, int portNumber) {
-	return error_state::SUCCESS;
+	try {
+		// should already connect to it
+		Client = gcnew TcpClient(hostName, portNumber);
+		Stream = Client->GetStream();
+		Client->NoDelay = true;
+		Client->ReceiveTimeout = 5000;
+		Client->SendTimeout = 5000;
+		Client->ReceiveBufferSize = 2048;
+		Client->SendBufferSize = 1024;
+
+		ReadData = gcnew array<unsigned char>(2048);
+		return error_state::SUCCESS;
+	}
+	catch (Exception^ e) {
+		// Handle exceptions
+		std::string ErrorMessage = msclr::interop::marshal_as<std::string>(e->Message);
+		std::cerr << "Exception when connecting: " << ErrorMessage << '\n';
+		return error_state::ERR_CONNECTION; // Return connection error state
+	}
 }
 error_state GNSS::communicate() {
-	return error_state::SUCCESS;
+	if (Client == nullptr || Stream == nullptr) {
+		return error_state::ERR_CONNECTION;
+	}
+	try {
+		Stream->Read(ReadData, 0, ReadData->Length);
+		return error_state::SUCCESS;
+	}
+	catch (Exception^ e) {
+		std::string ErrorMessage = msclr::interop::marshal_as<std::string>(e->Message);
+		std::cerr << "Exception found when sending command: " << ErrorMessage << '\n';
+		return error_state::ERR_RESPONSE;
+	}
 }
 
 void GNSS::shutdownModules() {
 	SM_TM_->shutdown = bit_ALL;
+}
+
+// checksum functions obtained from appendix A
+unsigned long GNSS::CRC32Value(int i)
+{
+	int j;
+	unsigned long ulCRC;
+	ulCRC = i;
+	for (j = 8; j > 0; j--)
+	{
+		if (ulCRC & 1)
+			ulCRC = (ulCRC >> 1) ^ CRC32_POLYNOMIAL;
+		else
+			ulCRC >>= 1;
+	}
+	return ulCRC;
+}
+
+unsigned long GNSS::CalculateBlockCRC32(
+	unsigned long ulCount, /* Number of bytes in the data block */
+	unsigned char* ucBuffer) /* Data block */
+{
+	unsigned long ulTemp1;
+	unsigned long ulTemp2;
+	unsigned long ulCRC = 0;
+	while (ulCount-- != 0)
+	{
+		ulTemp1 = (ulCRC >> 8) & 0x00FFFFFFL;
+		ulTemp2 = CRC32Value(((int)ulCRC ^ * ucBuffer++) & 0xff);
+		ulCRC = ulTemp1 ^ ulTemp2;
+	}
+	return(ulCRC);
 }
