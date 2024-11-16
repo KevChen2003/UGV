@@ -129,8 +129,16 @@ error_state GNSS::communicate() {
 		GNSSData GNSSStruct;
 
 		// read 108 bytes of data into GNSS Struct
-		array<unsigned char>^ buffer = gcnew array<unsigned char>(108);
-		int bytesRead = Stream->Read(buffer, 0, buffer->Length);
+		array<unsigned char>^ buffer = gcnew array<unsigned char>(112);
+
+		// manually add header back into GNSSStruct
+		buffer[0] = (Header >> 24) & 0xFF;
+		buffer[1] = (Header >> 16) & 0xFF;
+		buffer[2] = (Header >> 8) & 0xFF;
+		buffer[3] = Header & 0xFF;
+
+		// read the rest into GNSSStruct
+		int bytesRead = Stream->Read(buffer, 4, 108);
 		// Ensure we've read all 108 bytes
 		if (bytesRead != 108) {
 			Console::WriteLine("Error: Could not read 108 bytes of data.");
