@@ -90,6 +90,9 @@ void CrashAvoidance::threadFunction() {
 		// OBSTACLES 
 		for (int i = 0; i < RangeX->Length; i++) {
 			// loop through values and update status
+
+			if (RangeX[i] == 0 && RangeY[i] == 0) continue; // skip through (0,0) points, as they're points outside of laser reach
+
 			if (!CheckDistance(RangeX[i], RangeY[i]) && RangeY[i] >= -280 && RangeY[i] <= 280) {
 				// object in front and within 1m, prevent from moving forwards
 				// Console::WriteLine("Inhibiting Forwards.");
@@ -118,8 +121,6 @@ void CrashAvoidance::threadFunction() {
 bool CrashAvoidance::CheckDistance(double x, double y) {
 	// check distance of point (x, y) from (0,0), return TRUE if distance < 1m, FALSE otherwise
 	// DISTANCE CAN BE M OR MM, SO SET TO < 1M OR <1000MM DEPENDING ON WHAT UNITS YOU WANT TO USE
-
-	double dist = std::sqrt(std::pow(x - 0, 2) + std::pow(y - 0, 2)) < 1000;
 
 	return std::sqrt(std::pow(x - 0, 2) + std::pow(y - 0, 2)) < 1000;
 }
