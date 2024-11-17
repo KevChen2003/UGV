@@ -82,11 +82,11 @@ error_state VC::communicate() {
 		if (speed > 0.0 && !CanGoForwards) {
 			speed = 0.0;
 		}
-		else if (steerVal > 0.0 && !CanSteerRight) {
+		if (steerVal > 0.0 && !CanSteerRight) {
 			// based off simulator assuming that + steer value = going right
 			steerVal = 0.0;
 		}
-		else if (steerVal < 0.0 && !CanSteerLeft) {
+		if (steerVal < 0.0 && !CanSteerLeft) {
 			// based off simulator assuming that - steer value = going left
 			steerVal = 0.0;
 		}

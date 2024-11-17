@@ -92,24 +92,26 @@ void CrashAvoidance::threadFunction() {
 			// loop through values and update status
 
 			if (RangeX[i] == 0 && RangeY[i] == 0) continue; // skip through (0,0) points, as they're points outside of laser reach
+			
 			// sometimes comment these out on sim to allow the robot to actually move, otherwise it will think that there's obstacles and won't move
-			/*
-			if (!CheckDistance(RangeX[i], RangeY[i]) && RangeY[i] >= -280 && RangeY[i] <= 280) {
+			
+			// left and right might be flipped, negative Y might be left and positive Y might be right on the real robot
+			if (CheckDistance(RangeX[i], RangeY[i]) && RangeY[i] >= -280 && RangeY[i] <= 280) {
 				// object in front and within 1m, prevent from moving forwards
-				// Console::WriteLine("Inhibiting Forwards.");
+				Console::WriteLine("Inhibiting Forwards.");
 				CanGoForwards = false;
 			}
-			else if (!CheckDistance(RangeX[i], RangeY[i]) && RangeY[i] > 280) {
+			else if (CheckDistance(RangeX[i], RangeY[i]) && RangeY[i] > 280) {
 				// object within 1m on vehicle's left , prevent it from steering left
-				// Console::WriteLine("Inhibiting Left.");
+				Console::WriteLine("Inhibiting Left.");
 				CanSteerLeft = false;
 			}
-			else if (!CheckDistance(RangeX[i], RangeY[i]) && RangeY[i] < -280) {
+			else if (CheckDistance(RangeX[i], RangeY[i]) && RangeY[i] < -280) {
 				// obkect within 1m on vehicle's right, prevent steering right
-				// Console::WriteLine("Inhibiting Right.");
+				Console::WriteLine("Inhibiting Right.");
 				CanSteerRight = false;
 			}
-			*/
+			
 		}
 		
 
@@ -124,7 +126,11 @@ bool CrashAvoidance::CheckDistance(double x, double y) {
 	// check distance of point (x, y) from (0,0), return TRUE if distance < 1m, FALSE otherwise
 	// DISTANCE CAN BE M OR MM, SO SET TO < 1M OR <1000MM DEPENDING ON WHAT UNITS YOU WANT TO USE
 
-	return std::sqrt(std::pow(x - 0, 2) + std::pow(y - 0, 2)) < 1000;
+	double dist = std::sqrt(std::pow(x - 0, 2) + std::pow(y - 0, 2));
+
+	// if (dist < 1000.0) Console::WriteLine("Calculated dist: {0}", dist);
+
+	return dist < 1000.0;
 }
 
 error_state CrashAvoidance::processHeartBeats() {
