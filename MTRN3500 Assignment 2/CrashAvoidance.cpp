@@ -92,7 +92,8 @@ void CrashAvoidance::threadFunction() {
 			// loop through values and update status
 
 			if (RangeX[i] == 0 && RangeY[i] == 0) continue; // skip through (0,0) points, as they're points outside of laser reach
-
+			// sometimes comment these out on sim to allow the robot to actually move, otherwise it will think that there's obstacles and won't move
+			/*
 			if (!CheckDistance(RangeX[i], RangeY[i]) && RangeY[i] >= -280 && RangeY[i] <= 280) {
 				// object in front and within 1m, prevent from moving forwards
 				// Console::WriteLine("Inhibiting Forwards.");
@@ -108,6 +109,7 @@ void CrashAvoidance::threadFunction() {
 				// Console::WriteLine("Inhibiting Right.");
 				CanSteerRight = false;
 			}
+			*/
 		}
 		
 

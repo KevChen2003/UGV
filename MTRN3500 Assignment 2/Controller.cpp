@@ -46,7 +46,7 @@ void Controller::threadFunction() {
 	// initialise controller interface
 	// 1st param = xbox player num
 	// 2nd param = 0 if xbox control, 1 if keyboard
-	bool keyboard = true;
+	bool keyboard = false;
 	ControllerInterface_ = new ControllerInterface(1, keyboard);
 
 	// wait at the barrier for other threads
@@ -64,10 +64,17 @@ void Controller::threadFunction() {
 			// ControllerInterface_->printControllerState(state);
 			// speed = right trigger - left trigger
 			// steer = right thumb x
+
+			if (state.buttonX) {
+				// set controller button X as shutdown
+				shutdownModules();
+			}
+
 			speed = state.rightTrigger - state.leftTrigger;
 			steer = state.rightThumbX;
 			// apparently keyboard steering is flipped
-			if (keyboard) steer = -1 * steer;
+			// if (keyboard) steer = -1 * steer;
+			steer = -1 * steer;
 			// Console::WriteLine("Speed: {0}, Steer: {1}", speed, steer);
 
 		}
