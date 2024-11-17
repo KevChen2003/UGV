@@ -64,17 +64,25 @@ void Laser::threadFunction() {
 					RangeX = gcnew array<double>(NumRanges);
 					RangeY = gcnew array<double>(NumRanges);
 
-					for (int i = 0; i < NumRanges; i++) {
-						Range[i] = System::Convert::ToInt32(StringArray[26 + i], 16);
+					// Console::WriteLine("Start Angle: {0}, Resolution: {1}, NumPoints: {2}", StartAngle, Resolution, NumRanges);
+					
+					// validate laser data, could also check if distance is too far
+					if (StartAngle == 0.0 && Resolution == 0.5 && NumRanges == 361) {
 
-						double pi = Math::PI;
-						RangeX[i] = Range[i] * cos(i * Resolution * pi/180);
-						RangeY[i] = Range[i] * sin(i * Resolution * pi/180);
-						// print out the X and Y
-						// Console::WriteLine("Point {0:D}:  X: {1:F3}, Y: {2:F3}", PointNum++, RangeX[i], RangeY[i]);
+						for (int i = 0; i < NumRanges; i++) {
+							Range[i] = System::Convert::ToInt32(StringArray[26 + i], 16);
 
-						// send it to Display
-						processSharedMemory();
+							double pi = Math::PI;
+							RangeX[i] = Range[i] * cos(i * Resolution * pi / 180);
+							RangeY[i] = Range[i] * sin(i * Resolution * pi / 180);
+							// print out the X and Y
+							// Console::WriteLine("Point {0:D}:  X: {1:F3}, Y: {2:F3}", PointNum++, RangeX[i], RangeY[i]);
+
+							// send it to Display
+							processSharedMemory();
+						}
+					} else {
+						Console::WriteLine("Invalid Laser Data Read.");
 					}
 				} catch (System::FormatException^ e) {
 					Console::WriteLine("Format Exception: {0}", e->Message);
