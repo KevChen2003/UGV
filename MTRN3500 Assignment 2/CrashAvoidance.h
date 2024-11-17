@@ -11,7 +11,7 @@ public:
 
     CrashAvoidance();
 
-    CrashAvoidance(SM_ThreadManagement^ SM_TM, SM_Laser^ SM_Laser, SM_GPS^ SM_Gps);
+    CrashAvoidance(SM_ThreadManagement^ SM_TM, SM_Laser^ SM_Laser, SM_GPS^ SM_Gps, SM_CrashAvoidance^ SM_CA);
 
     ~CrashAvoidance();
 
@@ -31,10 +31,17 @@ public:
 
     void shutdownModules();
 
+    bool CheckDistance(double x, double y);
+
+    error_state SetFlags(bool CanGoForwards, bool CanSteerLeft, bool CanSteerRight);
+
 private:
     // Add any additional data members or helper functions here
     SM_ThreadManagement^ SM_TM_;
     SM_Laser^ SM_Laser_;
     SM_GPS^ SM_Gps_;
+    SM_CrashAvoidance^ SM_CA_;
     Stopwatch^ Watch;
+    array<double>^ RangeX;
+    array<double>^ RangeY;
 };

@@ -4,14 +4,16 @@
 
 VC::VC() { };
 
-VC::VC(SM_ThreadManagement^ SM_TM, SM_Laser^ SM_Laser, SM_GPS^ SM_Gps, SM_VehicleControl^ SM_VC) {
+VC::VC(SM_ThreadManagement^ SM_TM, SM_Laser^ SM_Laser, SM_GPS^ SM_Gps, SM_VehicleControl^ SM_VC, SM_CrashAvoidance^ SM_CA) {
 	SM_TM_ = SM_TM;
 	SM_Laser_ = SM_Laser; 
 	SM_Gps_ = SM_Gps;
 	SM_VC_ = SM_VC;
+	SM_CA_ = SM_CA;
 }
 
 error_state VC::processSharedMemory() {
+	// grab speed and steer
 	// Enter the monitor to ensure thread-safe access
 	Monitor::Enter(SM_VC_->lockObject);
 	try {
@@ -22,6 +24,19 @@ error_state VC::processSharedMemory() {
 	finally {
 		// Exit the monitor
 		Monitor::Exit(SM_VC_->lockObject);
+	}
+
+	// grab flags
+	Monitor::Enter(SM_CA_->lockObject);
+	try {
+		// Read the speed and steering values
+		CanGoForwards = SM_CA_->CanGoForwards;
+		CanSteerLeft = SM_CA_->CanSteerLeft;
+		CanSteerRight = SM_CA_->CanSteerRight;
+	}
+	finally {
+		// Exit the monitor
+		Monitor::Exit(SM_CA_->lockObject);
 	}
 	return error_state::SUCCESS;
 }
@@ -64,6 +79,17 @@ error_state VC::communicate() {
 	}
 	try {
 		double steerVal = steer * 40.0;
+		if (speed > 0.0 && !CanGoForwards) {
+			speed = 0.0;
+		}
+		else if (steerVal > 0.0 && !CanSteerRight) {
+			// based off simulator assuming that + steer value = going right
+			steerVal = 0.0;
+		}
+		else if (steerVal < 0.0 && !CanSteerLeft) {
+			// based off simulator assuming that - steer value = going left
+			steerVal = 0.0;
+		}
 		String^ command = String::Format("# {0} {1} {2} #", steerVal, speed, wdog);
 		// keep wdog alternating
 		wdog = ~wdog;

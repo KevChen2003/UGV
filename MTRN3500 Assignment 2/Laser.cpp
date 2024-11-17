@@ -38,6 +38,8 @@ void Laser::threadFunction() {
 			int PointNum = 0;
 			error_state response = communicate();
 
+			// STILL HAVE TO VALIDATE LASER DATA
+
 			if (response != error_state::SUCCESS) {
 				Console::WriteLine("Error trying to scan data.");
 				break;
@@ -69,7 +71,7 @@ void Laser::threadFunction() {
 						RangeX[i] = Range[i] * cos(i * Resolution * pi/180);
 						RangeY[i] = Range[i] * sin(i * Resolution * pi/180);
 						// print out the X and Y
-						//Console::WriteLine("Point {0:D}:  X: {1:F3}, Y: {2:F3}", PointNum++, RangeX[i], RangeY[i]);
+						// Console::WriteLine("Point {0:D}:  X: {1:F3}, Y: {2:F3}", PointNum++, RangeX[i], RangeY[i]);
 
 						// send it to Display
 						processSharedMemory();
@@ -143,6 +145,7 @@ error_state Laser::communicate() {
 		Stream->Write(SendData, 0, SendData->Length);
 		// increase delay to remove trhe string error, but this delays the sim more
 		Threading::Thread::Sleep(20);
+
 		Stream->Read(ReadData, 0, ReadData->Length);
 		return error_state::SUCCESS;
 	}

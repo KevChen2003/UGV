@@ -77,7 +77,7 @@ void Controller::threadFunction() {
 		}
 		// next, send the values over to VC, who should send it to control the robot's movements
 		processSharedMemory();
-		Thread::Sleep(20);
+		Thread::Sleep(10);
 	}
 	Console::WriteLine("Controller Thread is terminating.");
 }

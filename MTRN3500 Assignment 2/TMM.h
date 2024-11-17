@@ -51,6 +51,7 @@ private:
     SM_Laser^ SM_Laser_; 
     SM_GPS^ SM_Gps_;
     SM_VehicleControl^ SM_VC_;
+    SM_CrashAvoidance^ SM_CA_;
     array<Stopwatch^>^ StopwatchList;
     array<Thread^>^ ThreadList;
     array<ThreadProperties^>^ ThreadPropertiesList;

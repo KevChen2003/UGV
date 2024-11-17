@@ -24,17 +24,17 @@ using namespace System::Diagnostics;
 // Defines which processes are critical and not critical
 // Ordering of processes in the mask should be based on the order in the UnitFlags type below.
 // You should change this based on what processes are and are not critical
-constexpr uint8_t NONCRITICALMASK = 0xff;
-constexpr uint8_t CRITICALMASK =    0x00;
+constexpr uint8_t NONCRITICALMASK = 0x44;
+constexpr uint8_t CRITICALMASK =    0x3B;
 
 constexpr uint8_t bit_ALL =             0b01111111;
 constexpr uint8_t bit_TM =              0b00000001;
 constexpr uint8_t bit_LASER =           0b00000010;
-constexpr uint8_t bit_GPS =             0b00000100;
+constexpr uint8_t bit_GPS =             0b00000100; // non crit
 constexpr uint8_t bit_VC =              0b00001000;
 constexpr uint8_t bit_CONTROLLER =      0b00010000;
 constexpr uint8_t bit_DISPLAY =         0b00100000;
-constexpr uint8_t bit_CRASHAVOIDANCE =  0b01000000;
+constexpr uint8_t bit_CRASHAVOIDANCE =  0b01000000; // non crit
 
 ref class SM_ThreadManagement
 {
@@ -90,6 +90,18 @@ public:
     double Steering;
 
     SM_VehicleControl() {
+        lockObject = gcnew Object();
+    }
+};
+
+ref class SM_CrashAvoidance {
+public:
+    Object^ lockObject;
+    bool CanGoForwards = true;
+    bool CanSteerLeft = true;
+    bool CanSteerRight = true;
+
+    SM_CrashAvoidance() {
         lockObject = gcnew Object();
     }
 };

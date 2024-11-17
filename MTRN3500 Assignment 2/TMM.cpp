@@ -11,6 +11,7 @@ error_state ThreadManagement::setupSharedMemory() {
 	SM_Laser_ = gcnew SM_Laser;
 	SM_Gps_ = gcnew SM_GPS;
 	SM_VC_ = gcnew SM_VehicleControl;
+	SM_CA_ = gcnew SM_CrashAvoidance;
 	return error_state::SUCCESS;
 }
 
@@ -34,9 +35,9 @@ void ThreadManagement::threadFunction() {
 		gcnew ThreadProperties(gcnew ThreadStart(gcnew Laser(SM_TM_, SM_Laser_, SM_Gps_), &Laser::threadFunction), true, bit_LASER, "Laser Thread"),
 			gcnew ThreadProperties(gcnew ThreadStart(gcnew GNSS(SM_TM_, SM_Laser_, SM_Gps_), &GNSS::threadFunction), false, bit_GPS, "GNSS Thread"),
 			gcnew ThreadProperties(gcnew ThreadStart(gcnew Controller(SM_TM_, SM_Laser_, SM_Gps_, SM_VC_), &Controller::threadFunction), true, bit_CONTROLLER, "Controller Thread"),
-			gcnew ThreadProperties(gcnew ThreadStart(gcnew VC(SM_TM_, SM_Laser_, SM_Gps_, SM_VC_), &VC::threadFunction), true, bit_VC, "VC Thread"),
+			gcnew ThreadProperties(gcnew ThreadStart(gcnew VC(SM_TM_, SM_Laser_, SM_Gps_, SM_VC_, SM_CA_), &VC::threadFunction), true, bit_VC, "VC Thread"),
 			gcnew ThreadProperties(gcnew ThreadStart(gcnew Display(SM_TM_, SM_Laser_, SM_Gps_), &Display::threadFunction), true, bit_DISPLAY, "Display Thread"),
-			gcnew ThreadProperties(gcnew ThreadStart(gcnew CrashAvoidance(SM_TM_, SM_Laser_, SM_Gps_), &CrashAvoidance::threadFunction), false, bit_CRASHAVOIDANCE, "Crash Avoidance Thread")
+			gcnew ThreadProperties(gcnew ThreadStart(gcnew CrashAvoidance(SM_TM_, SM_Laser_, SM_Gps_, SM_CA_), &CrashAvoidance::threadFunction), false, bit_CRASHAVOIDANCE, "Crash Avoidance Thread")
 	};
 	// list of threads
 	ThreadList = gcnew array<Thread^>(ThreadPropertiesList->Length);
@@ -75,7 +76,7 @@ void ThreadManagement::threadFunction() {
 		}
 		// Console::WriteLine("TMT Thread is running");
 		processHeartBeats();
-		Thread::Sleep(50);
+		Thread::Sleep(10);
 	}
 
 	// shutdown threads

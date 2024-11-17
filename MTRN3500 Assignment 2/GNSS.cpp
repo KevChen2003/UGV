@@ -35,10 +35,10 @@ void GNSS::threadFunction() {
 				// if communication is successful and data is successful, put the data in GNSS shared memory
 				processSharedMemory();
 
-				// print values
-				Console::WriteLine("Northing: {0}, Easting: {1}, Height: {2}, Received CRC: {3}, Calculated CRC: {4}", Northing, Easting, Height, CRC, CalculatedCRC);
+				// PRINT VALUES (currently commented out to reduce control delay) ---------------------------
+				// Console::WriteLine("Northing: {0}, Easting: {1}, Height: {2}, Received CRC: {3}, Calculated CRC: {4}", Northing, Easting, Height, CRC, CalculatedCRC);
 			}
-			Thread::Sleep(20);
+			Thread::Sleep(10);
 		}
 	}
 	Console::WriteLine("GNSS Thread is terminating.");

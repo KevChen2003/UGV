@@ -1,11 +1,13 @@
 #include "CrashAvoidance.h"
+#include <cmath>
 
 CrashAvoidance::CrashAvoidance() {}
 
-CrashAvoidance::CrashAvoidance(SM_ThreadManagement^ SM_TM, SM_Laser^ SM_Laser, SM_GPS^ SM_Gps) {
+CrashAvoidance::CrashAvoidance(SM_ThreadManagement^ SM_TM, SM_Laser^ SM_Laser, SM_GPS^ SM_Gps, SM_CrashAvoidance^ SM_CA) {
 	SM_TM_ = SM_TM;
 	SM_Laser_ = SM_Laser;
 	SM_Gps_ = SM_Gps;
+	SM_CA_ = SM_CA;
 }
 
 CrashAvoidance::~CrashAvoidance() {}
@@ -14,6 +16,35 @@ error_state CrashAvoidance::setupSharedMemory() {
 }
 
 error_state CrashAvoidance::processSharedMemory() {
+	// grab x and y values from SM laser
+	// Enter the monitor to ensure thread-safe access
+	Monitor::Enter(SM_Laser_->lockObject);
+	try {
+		// grab the x and y values
+		RangeX = SM_Laser_->x;
+		RangeY = SM_Laser_->y;
+	}
+	finally {
+		// Exit the monitor
+		Monitor::Exit(SM_Laser_->lockObject);
+	}
+	return error_state::SUCCESS;
+}
+
+error_state CrashAvoidance::SetFlags(bool CanGoForwards, bool CanSteerLeft, bool CanSteerRight) {
+	// set movement flags
+	// Enter the monitor to ensure thread-safe access
+	Monitor::Enter(SM_CA_->lockObject);
+	try {
+		// set flags
+		SM_CA_->CanGoForwards = CanGoForwards;
+		SM_CA_->CanSteerLeft = CanSteerLeft;
+		SM_CA_->CanSteerRight = CanSteerRight;
+	}
+	finally {
+		// Exit the monitor
+		Monitor::Exit(SM_CA_->lockObject);
+	}
 	return error_state::SUCCESS;
 }
 
@@ -38,9 +69,59 @@ void CrashAvoidance::threadFunction() {
 		// Console::WriteLine("CrashAvoidance Thread is running.");
 		processHeartBeats();
 		// CrashAvoidance functionality 
-		Thread::Sleep(20);
+
+		// from edstem forum: UGV has length 1310mm and width 560mm
+		// if laser detects y value between -280 and +280 (within vehicle width), and the distance of the point < 1m. prevent vehicle from going forwards
+		// if the laser detects outside, but still within 1m and y > 280, then prevent vehicle from steering left
+		// if laser detects outside, but still within 1m and y < -280, then prevent vehicle from steering right
+		
+		// for this, you can change values in SM_VC, but what happens if VC gets access to it before this thread can,
+		// then the check wouldn't do anything
+		
+		processSharedMemory();
+
+		// set movement flags every iteration, true if no objects within crash distance
+		bool CanGoForwards = true;
+		bool CanSteerLeft = true;
+		bool CanSteerRight = true;
+		
+		// THIS IS ALL ASSUMING LASER IS IN MM
+		// THE LASER SIMULATED READINGS ARE ALL WITHIN 1000, SO IF YOU USE MM THEN ALL READINGS WILL SHOW
+		// OBSTACLES 
+		for (int i = 0; i < RangeX->Length; i++) {
+			// loop through values and update status
+			if (!CheckDistance(RangeX[i], RangeY[i]) && RangeY[i] >= -280 && RangeY[i] <= 280) {
+				// object in front and within 1m, prevent from moving forwards
+				// Console::WriteLine("Inhibiting Forwards.");
+				CanGoForwards = false;
+			}
+			else if (!CheckDistance(RangeX[i], RangeY[i]) && RangeY[i] > 280) {
+				// object within 1m on vehicle's left , prevent it from steering left
+				// Console::WriteLine("Inhibiting Left.");
+				CanSteerLeft = false;
+			}
+			else if (!CheckDistance(RangeX[i], RangeY[i]) && RangeY[i] < -280) {
+				// obkect within 1m on vehicle's right, prevent steering right
+				// Console::WriteLine("Inhibiting Right.");
+				CanSteerRight = false;
+			}
+		}
+		
+
+		SetFlags(CanGoForwards, CanSteerLeft, CanSteerRight);
+
+		Thread::Sleep(10);
 	}
 	Console::WriteLine("CrashAvoidance Thread is terminating.");
+}
+
+bool CrashAvoidance::CheckDistance(double x, double y) {
+	// check distance of point (x, y) from (0,0), return TRUE if distance < 1m, FALSE otherwise
+	// DISTANCE CAN BE M OR MM, SO SET TO < 1M OR <1000MM DEPENDING ON WHAT UNITS YOU WANT TO USE
+
+	double dist = std::sqrt(std::pow(x - 0, 2) + std::pow(y - 0, 2)) < 1000;
+
+	return std::sqrt(std::pow(x - 0, 2) + std::pow(y - 0, 2)) < 1000;
 }
 
 error_state CrashAvoidance::processHeartBeats() {
