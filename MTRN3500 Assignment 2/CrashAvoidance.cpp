@@ -96,6 +96,8 @@ void CrashAvoidance::threadFunction() {
 			// sometimes comment these out on sim to allow the robot to actually move, otherwise it will think that there's obstacles and won't move
 			
 			// left and right might be flipped, negative Y might be left and positive Y might be right on the real robot
+			/*
+			// using mm but inaccurate on actual robot
 			if (CheckDistance(RangeX[i], RangeY[i]) && RangeY[i] >= -280 && RangeY[i] <= 280) {
 				// object in front and within 1m, prevent from moving forwards
 				//Console::WriteLine("Inhibiting Forwards.");
@@ -111,6 +113,24 @@ void CrashAvoidance::threadFunction() {
 				//Console::WriteLine("Inhibiting Right.");
 				CanSteerRight = false;
 			}
+			*/
+
+			if (CheckDistance(RangeX[i], RangeY[i]) && i >= 90 && i <= 270) {
+				// object in front and within 1m, prevent from moving forwards
+				Console::WriteLine("Inhibiting Forwards.");
+				CanGoForwards = false;
+			}
+			else if (CheckDistance(RangeX[i], RangeY[i]) && i > 270) {
+				// object within 1m on vehicle's left , prevent it from steering left
+				Console::WriteLine("Inhibiting Left.");
+				CanSteerLeft = false;
+			}
+			else if (CheckDistance(RangeX[i], RangeY[i]) && i < 90) {
+				// obkect within 1m on vehicle's right, prevent steering right
+				Console::WriteLine("Inhibiting Right.");
+				CanSteerRight = false;
+			}
+
 			
 		}
 		
