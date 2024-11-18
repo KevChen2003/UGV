@@ -80,14 +80,17 @@ error_state VC::communicate() {
 	try {
 		double steerVal = steer * 40.0;
 		if (speed > 0.0 && !CanGoForwards) {
+			//Console::WriteLine("Can't go foward.");
 			speed = 0.0;
 		}
 		if (steerVal > 0.0 && !CanSteerRight) {
 			// based off simulator assuming that + steer value = going right
+			//Console::WriteLine("Can't go right.");
 			steerVal = 0.0;
 		}
 		if (steerVal < 0.0 && !CanSteerLeft) {
 			// based off simulator assuming that - steer value = going left
+			//Console::WriteLine("Can't go left.");
 			steerVal = 0.0;
 		}
 		String^ command = String::Format("# {0} {1} {2} #", steerVal, speed, wdog);
