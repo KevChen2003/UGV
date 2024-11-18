@@ -182,7 +182,16 @@ error_state Laser::connect(String^ hostName, int portNumber) {
 		SendData = System::Text::Encoding::ASCII->GetBytes("5360742\n");
 		Stream->Write(SendData, 0, SendData->Length);
 		Threading::Thread::Sleep(10);
-		return error_state::SUCCESS;
+		Stream->Read(ReadData, 0, ReadData->Length);
+		String^ Response = System::Text::Encoding::ASCII->GetString(ReadData);
+		
+		if (Response->Contains("OK")) {
+			return error_state::SUCCESS;
+		}
+		else {
+			Console::WriteLine("Unable to Authenticate Laser.");
+			return error_state::ERR_CONNECTION;
+		}
 	}
 	catch (Exception^ e) {
 		// Handle exceptions

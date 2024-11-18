@@ -63,6 +63,16 @@ error_state VC::connect(String^ hostName, int portNumber) {
 		SendData = System::Text::Encoding::ASCII->GetBytes("5360742\n");
 		Stream->Write(SendData, 0, SendData->Length);
 		Threading::Thread::Sleep(10);
+		Stream->Read(ReadData, 0, ReadData->Length);
+		String^ Response = System::Text::Encoding::ASCII->GetString(ReadData);
+
+		if (Response->Contains("OK")) {
+			return error_state::SUCCESS;
+		}
+		else {
+			Console::WriteLine("Unable to Authenticate Vehicle Control.");
+			return error_state::ERR_CONNECTION;
+		}
 		return error_state::SUCCESS;
 	}
 	catch (Exception^ e) {
@@ -85,12 +95,12 @@ error_state VC::communicate() {
 		}
 		if (steerVal < 0.0 && !CanSteerRight) {
 			// based off simulator assuming that + steer value = going right
-			Console::WriteLine("Can't go right.");
+			//Console::WriteLine("Can't go right.");
 			steerVal = 0.0;
 		}
 		if (steerVal > 0.0 && !CanSteerLeft) {
 			// based off simulator assuming that - steer value = going left
-			Console::WriteLine("Can't go left.");
+			//Console::WriteLine("Can't go left.");
 			steerVal = 0.0;
 		}
 		String^ command = String::Format("# {0} {1} {2} #", steerVal, speed, wdog);

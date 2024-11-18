@@ -115,19 +115,20 @@ void CrashAvoidance::threadFunction() {
 			}
 			*/
 
+			// using 0.5 degree resolution
 			if (CheckDistance(RangeX[i], RangeY[i]) && i >= 90 && i <= 270) {
 				// object in front (between 45 and 135 degrees) and within 1m, prevent from moving forwards
-				Console::WriteLine("Inhibiting Forwards.");
+				//Console::WriteLine("Inhibiting Forwards.");
 				CanGoForwards = false;
 			}
 			else if (CheckDistance(RangeX[i], RangeY[i]) && i > 270) {
 				// object within 1m on vehicle's left (between 135 and 180 degrees), prevent it from steering left
-				Console::WriteLine("Inhibiting Left.");
+				//Console::WriteLine("Inhibiting Left.");
 				CanSteerLeft = false;
 			}
 			else if (CheckDistance(RangeX[i], RangeY[i]) && i < 90) {
 				// obkect within 1m on vehicle's right (between 0 and 45 degrees), prevent steering right
-				Console::WriteLine("Inhibiting Right.");
+				//Console::WriteLine("Inhibiting Right.");
 				CanSteerRight = false;
 			}
 

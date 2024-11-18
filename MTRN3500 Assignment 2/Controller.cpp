@@ -46,7 +46,7 @@ void Controller::threadFunction() {
 	// initialise controller interface
 	// 1st param = xbox player num
 	// 2nd param = 0 if xbox control, 1 if keyboard
-	bool keyboard = false;
+	bool keyboard = true;
 	ControllerInterface_ = new ControllerInterface(1, keyboard);
 
 	// wait at the barrier for other threads
