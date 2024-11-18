@@ -66,11 +66,13 @@ error_state VC::connect(String^ hostName, int portNumber) {
 		Stream->Read(ReadData, 0, ReadData->Length);
 		String^ Response = System::Text::Encoding::ASCII->GetString(ReadData);
 
+		// response should be "OK\n", but on the simulator it has more whitespaces so instead of doing a 
+		// direct match, I'm just ensuring that "OK" is within the response
 		if (Response->Contains("OK")) {
 			return error_state::SUCCESS;
 		}
 		else {
-			Console::WriteLine("Unable to Authenticate Vehicle Control.");
+			Console::WriteLine("Failed to Authenticate Vehicle Control.");
 			return error_state::ERR_CONNECTION;
 		}
 		return error_state::SUCCESS;
