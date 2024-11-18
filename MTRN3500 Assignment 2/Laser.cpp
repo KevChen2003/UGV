@@ -116,7 +116,8 @@ error_state Laser::processHeartBeats() {
 		if (Watch->ElapsedMilliseconds > CRASH_LIMIT) {
 			// if the laser bit is up and the watch has exceeded the limit
 			// shutdown all threads
-			Console::WriteLine("TMM Failure.");
+			// printing error here before modules are shut down
+			printError(error_state::ERR_TMM_FAILURE);
 			shutdownModules();
 			return error_state::ERR_TMM_FAILURE;
 		}

@@ -55,6 +55,8 @@ error_state GNSS::processHeartBeats() {
 		if (Watch->ElapsedMilliseconds > CRASH_LIMIT) {
 			// if the GNSS bit is up and the watch has exceeded the limit
 			// shutdown all threads
+			// printing error here before modules are shut down
+			printError(error_state::ERR_TMM_FAILURE);
 			shutdownModules();
 			return error_state::ERR_TMM_FAILURE;
 		}

@@ -71,6 +71,7 @@ void ThreadManagement::threadFunction() {
 		if (Console::KeyAvailable) {
 			auto key = Console::ReadKey();
 			if (key.KeyChar == 'q') {
+				Console::WriteLine("'q' Key Pressed. Shutting down...");
 				break;
 			}
 		}

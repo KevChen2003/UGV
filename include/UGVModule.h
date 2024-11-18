@@ -70,6 +70,24 @@ ref class UGVModule abstract
 					std::cout << "ERROR: Invalid Data Received." << std::endl;
 					break;
 				// ADD PRINTOUTS FOR OTHER ERROR TYPES
+				case ERR_STARTUP: 
+					std::cout << "ERROR: Error On Startup." << std::endl;
+					break;
+				case ERR_SM:
+					std::cout << "ERROR: Error on Shared Memory." << std::endl;
+					break;
+				case ERR_CONNECTION:
+					std::cout << "ERROR: Error when attempting to connect." << std::endl;
+					break;
+				case ERR_CRITICAL_PROCESS_FAILURE:
+					std::cout << "ERROR: Critical Process Failure." << std::endl;
+					break;
+				case ERR_TMM_FAILURE:
+					std::cout << "ERROR: TMM Thread Failure" << std::endl;
+					break;
+				case ERR_RESPONSE:
+					std::cout << "ERROR: Error in reading response." << std::endl;
+					break;
 			}
 		}
 

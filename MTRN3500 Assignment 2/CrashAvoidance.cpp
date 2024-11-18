@@ -98,17 +98,17 @@ void CrashAvoidance::threadFunction() {
 			// left and right might be flipped, negative Y might be left and positive Y might be right on the real robot
 			if (CheckDistance(RangeX[i], RangeY[i]) && RangeY[i] >= -280 && RangeY[i] <= 280) {
 				// object in front and within 1m, prevent from moving forwards
-				Console::WriteLine("Inhibiting Forwards.");
+				//Console::WriteLine("Inhibiting Forwards.");
 				CanGoForwards = false;
 			}
 			else if (CheckDistance(RangeX[i], RangeY[i]) && RangeY[i] > 280) {
 				// object within 1m on vehicle's left , prevent it from steering left
-				Console::WriteLine("Inhibiting Left.");
+				//Console::WriteLine("Inhibiting Left.");
 				CanSteerLeft = false;
 			}
 			else if (CheckDistance(RangeX[i], RangeY[i]) && RangeY[i] < -280) {
 				// obkect within 1m on vehicle's right, prevent steering right
-				Console::WriteLine("Inhibiting Right.");
+				//Console::WriteLine("Inhibiting Right.");
 				CanSteerRight = false;
 			}
 			
@@ -144,6 +144,8 @@ error_state CrashAvoidance::processHeartBeats() {
 		if (Watch->ElapsedMilliseconds > CRASH_LIMIT) {
 			// if the CrashAvoidance bit is up and the watch has exceeded the limit
 			// shutdown all threads
+			// printing error here before modules are shut down
+			printError(error_state::ERR_TMM_FAILURE);
 			shutdownModules();
 			return error_state::ERR_TMM_FAILURE;
 		}
