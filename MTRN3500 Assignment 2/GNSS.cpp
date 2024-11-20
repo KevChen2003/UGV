@@ -36,7 +36,7 @@ void GNSS::threadFunction() {
 				processSharedMemory();
 
 				// PRINT VALUES (currently commented out to reduce control delay) ---------------------------
-				// Console::WriteLine("Northing: {0}, Easting: {1}, Height: {2}, Received CRC: {3}, Calculated CRC: {4}", Northing, Easting, Height, CRC, CalculatedCRC);
+				Console::WriteLine("Northing: {0}, Easting: {1}, Height: {2}, Received CRC: {3}, Calculated CRC: {4}", Northing, Easting, Height, CRC, CalculatedCRC);
 			}
 			Thread::Sleep(10);
 		}

@@ -107,7 +107,8 @@ error_state VC::communicate() {
 		}
 		String^ command = String::Format("# {0} {1} {2} #", steerVal, speed, wdog);
 		// keep wdog alternating
-		wdog = ~wdog;
+		// wdog = ~wdog;
+		wdog = 1 - wdog;
 		SendData = System::Text::Encoding::ASCII->GetBytes(command);
 		Stream->Write(SendData, 0, SendData->Length);
 		return error_state::SUCCESS;

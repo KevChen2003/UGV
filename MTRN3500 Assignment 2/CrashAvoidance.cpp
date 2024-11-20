@@ -65,6 +65,9 @@ void CrashAvoidance::threadFunction() {
 	SM_TM_->ThreadBarrier->SignalAndWait();
 	// start stopwatch
 	Watch->Start();
+
+	String^ Message = "";
+	String^ LastMessage = "";
 	while (!getShutdownFlag()) {
 		// Console::WriteLine("CrashAvoidance Thread is running.");
 		processHeartBeats();
@@ -88,6 +91,7 @@ void CrashAvoidance::threadFunction() {
 		// THIS IS ALL ASSUMING LASER IS IN MM
 		// THE LASER SIMULATED READINGS ARE ALL WITHIN 1000, SO IF YOU USE MM THEN ALL READINGS WILL SHOW
 		// OBSTACLES 
+		Message = "No Obstacles in Sight";
 		for (int i = 0; i < RangeX->Length; i++) {
 			// loop through values and update status
 
@@ -114,25 +118,30 @@ void CrashAvoidance::threadFunction() {
 				CanSteerRight = false;
 			}
 			*/
-
+			// REAL ONE
+			
 			// using 0.5 degree resolution
 			if (CheckDistance(RangeX[i], RangeY[i]) && i >= 90 && i <= 270) {
 				// object in front (between 45 and 135 degrees) and within 1m, prevent from moving forwards
 				//Console::WriteLine("Inhibiting Forwards.");
+				Message = "Obstacle Detected in Front.";
 				CanGoForwards = false;
 			}
 			else if (CheckDistance(RangeX[i], RangeY[i]) && i > 270) {
 				// object within 1m on vehicle's left (between 135 and 180 degrees), prevent it from steering left
 				//Console::WriteLine("Inhibiting Left.");
+				Message = "Obstacle Detected on the Left.";
 				CanSteerLeft = false;
 			}
 			else if (CheckDistance(RangeX[i], RangeY[i]) && i < 90) {
 				// obkect within 1m on vehicle's right (between 0 and 45 degrees), prevent steering right
 				//Console::WriteLine("Inhibiting Right.");
+				Message = "Obstacle Detected on the Right.";
 				CanSteerRight = false;
 			}
-
 			
+			if (Message != LastMessage) Console::WriteLine(Message); // prevents printing of duplicate error messages in a row
+			LastMessage = Message;
 		}
 		
 
