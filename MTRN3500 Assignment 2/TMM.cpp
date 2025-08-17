@@ -57,7 +57,7 @@ void ThreadManagement::threadFunction() {
 		ThreadList[i]->Start();
 	}
 
-	// wait at TMT thread barrier
+	// wait at TMT thread barrier, will wait for all threads to reach this point before proceeding further. allows synchronization of threads. 
 	SM_TM_->ThreadBarrier->SignalAndWait();
 
 	// start all stopwatches
